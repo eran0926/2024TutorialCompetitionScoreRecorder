@@ -7,15 +7,19 @@ body {
 }
 
 .btn {
-    max-aspect-ratio: 1/0.9;
     width: 100%;
+}
+
+.select-btn-group {
+    height: 70%;
 }
 
 .count-btn {
     height: 70%;
 }
 
-.count-btn {
+
+.decrease-btn {
     height: 70%;
 }
 

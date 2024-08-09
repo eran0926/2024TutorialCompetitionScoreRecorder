@@ -32,3 +32,57 @@ document.getElementById("auto-leave-select").addEventListener("click", function 
     });
 });
 
+init = function () {
+
+    allStage = document.getElementById("main-holder").children;
+    for (let i = 1; i < allStage.length; i++) {
+        allStage[i].style.display = "none";
+    }
+    for (let i = 0; i < allStage.length; i++) {
+        allStage[i].querySelectorAll(".count-btn").forEach(function (element) {
+            element.addEventListener("click", function (e) {
+                console.log(this)
+                score_div = this.querySelector(".score-div");
+                if (!this.parentElement.parentElement.querySelector("#decrease-btn").classList.contains("active")) {
+                    score_div.innerText = parseInt(score_div.innerText) + 1;
+                }
+                else {
+                    score_div.innerText = parseInt(score_div.innerText) - 1;
+                    this.parentElement.parentElement.querySelector("#decrease-btn").classList.toggle("active");
+                    this.parentElement.parentElement.querySelector("#decrease-btn").innerText = "Decrease";
+                }
+                // if this.parentElement.
+                // swipePage(1);
+            });
+        });
+        allStage[i].querySelectorAll("#decrease-btn").forEach(function (element) {
+            console.log(element)
+            element.addEventListener("click", function (e) {
+                this.classList.toggle("active");
+                if (this.classList.contains("active")) {
+                    this.innerText = "Increase";
+                }
+                else {
+                    this.innerText = "Decrease";
+                }
+                // if this.parentElement.
+                // swipePage(1);
+            });
+        });
+        // allStage[i].addEventListener("click", function (e) {
+        //     if (e.target.tagName == "BUTTON") {
+        //         swipePage(1);
+    }
+    // allStage = document.getElementById("main-holder").querySelectorAll('div[id^="auto-fleld"]');
+    // btn = document.getElementById("auto-speaker-btn");
+    // console.log(allStage);
+}
+
+
+window.onload = init()
+// document.getElementById("auto-speaker-btn").addEventListener("click", function (e) {
+//     allStage = document.getElementById("main-holder").querySelectorAll("*-field");;
+//     // btn = document.getElementById("auto-speaker-btn");
+//     console.log(allStage);
+//     // console.log(e.target.parentElement);
+// });
