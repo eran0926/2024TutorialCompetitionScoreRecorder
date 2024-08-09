@@ -15,8 +15,6 @@ function swipePage(increment) {
 document.getElementById("auto-leave-select").addEventListener("click", function (e) {
     console.log(e);
     console.log(" ddefef");
-    // e.classList.add("btn-info");
-    // e.classList.remove("btn-secondary");
     Array.from(document.getElementById("auto-leave-select").children).forEach(function (element) {
         if (element == e.target) {
             element.classList.remove("btn-secondary");
@@ -28,7 +26,6 @@ document.getElementById("auto-leave-select").addEventListener("click", function 
             element.classList.remove("btn-info");
             element.classList.add("btn-secondary");
         };
-        // swipePage(1);
     });
 });
 
@@ -51,8 +48,6 @@ init = function () {
                     this.parentElement.parentElement.querySelector("#decrease-btn").classList.toggle("active");
                     this.parentElement.parentElement.querySelector("#decrease-btn").innerText = "Decrease";
                 }
-                // if this.parentElement.
-                // swipePage(1);
             });
         });
         allStage[i].querySelectorAll("#decrease-btn").forEach(function (element) {
@@ -65,24 +60,10 @@ init = function () {
                 else {
                     this.innerText = "Decrease";
                 }
-                // if this.parentElement.
-                // swipePage(1);
             });
         });
-        // allStage[i].addEventListener("click", function (e) {
-        //     if (e.target.tagName == "BUTTON") {
-        //         swipePage(1);
     }
-    // allStage = document.getElementById("main-holder").querySelectorAll('div[id^="auto-fleld"]');
-    // btn = document.getElementById("auto-speaker-btn");
-    // console.log(allStage);
 }
 
 
 window.onload = init()
-// document.getElementById("auto-speaker-btn").addEventListener("click", function (e) {
-//     allStage = document.getElementById("main-holder").querySelectorAll("*-field");;
-//     // btn = document.getElementById("auto-speaker-btn");
-//     console.log(allStage);
-//     // console.log(e.target.parentElement);
-// });
