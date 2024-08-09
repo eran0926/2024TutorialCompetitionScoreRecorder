@@ -5,3 +5,32 @@ body {
     margin: 0;
     padding: 0; */
 }
+
+.btn {
+    max-aspect-ratio: 1/0.9;
+    width: 100%;
+}
+
+.count-btn {
+    height: 70%;
+}
+
+.count-btn {
+    height: 70%;
+}
+
+.switch-btn {
+    height: 80%;
+}
+
+.input-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.head {
+    color: white;
+    font-size: 2rem;
+    /* margin-bottom: 1rem; */
+}
