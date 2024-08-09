@@ -12,60 +12,109 @@
 </head>
 
 <body>
-    <div class="container-fluid text-center vh-100">
-        <div class="row align-items-center" style="height: 10%;">
-            <div class="head col">Autonomous</div>
-        </div>
+    <div id="main-holder">
+        <div class="container-fluid text-center vh-100">
+            <div class="row align-items-center" style="height: 10%;">
+                <div class="head col">Autonomous</div>
+            </div>
 
-        <div class="row  px-3" style="height: 80%; ">
-            <div class="input-div col-12">
-                <div class="count-btn btn-group w-100" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-warning btn-lg">no leave</button>
-                    <button type="button" class="btn btn-info btn-lg">part leave</button>
-                    <button type="button" class="btn btn-success btn-lg">completely leave</button>
+            <div id="auto-field" class="row  px-3" style="height: 80%; ">
+                <div class="input-div col-12">
+                    <div id="auto-leave-select" class="count-btn btn-group w-100" role="group"
+                        aria-label="Basic example">
+                        <button type="button" class="btn btn-secondary btn-lg" value="0">no leave</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="1">part leave</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="2">completely leave</button>
+                    </div>
+
                 </div>
+                <div class="input-div col-6 col-sm-3">
+                    <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
+                        <div>Speaker</div>
+                        <div>10</div>
+                    </button>
 
+                </div>
+                <div class="input-div col-6 col-sm-3">
+                    <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
+                        <div>Echo</div>
+                        <div>10</div>
+                    </button>
+
+                </div>
+                <div class="input-div col-6 col-sm-3">
+                    <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
+                        <div>fortissiom</div>
+                        <div>10</div>
+                    </button>
+
+                </div>
+                <div class="input-div col-6 col-sm-3 align-self:bottom">
+                    <button type="button" class="count-btn btn btn-danger btn-lg btn-block m-auto ">
+                        <div>Decrease</div>
+                    </button>
+
+                </div>
             </div>
-            <div class="input-div col-6 col-sm-3">
-                <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
-                    <div>Speaker</div>
-                    <div>10</div>
-                </button>
-
-            </div>
-            <div class="input-div col-6 col-sm-3">
-                <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
-                    <div>Echo</div>
-                    <div>10</div>
-                </button>
-
-            </div>
-            <div class="input-div col-6 col-sm-3">
-                <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
-                    <div>fortissiom</div>
-                    <div>10</div>
-                </button>
-
-            </div>
-            <div class="input-div col-6 col-sm-3 align-self:bottom">
-                <button type="button" class="count-btn btn btn-danger btn-lg btn-block m-auto ">
-                    <div>Decrease</div>
-                </button>
-
+            <div class="row align-items-center" style="height: 10%;">
+                <div class="col-6">
+                    <button type="button" class="switch-btn btn btn-info btn-lg"
+                        onclick="swipePage(-1)">previous</button>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="switch-btn btn btn-info btn-lg" onclick="swipePage(1)">next</button>
+                </div>
             </div>
         </div>
-        <div class="row align-items-center" style="height: 10%;">
-            <div class="col-6">
-                <button type="button" class="switch-btn btn btn-info btn-lg">previous</button>
+        <div class="container-fluid text-center vh-100" style="display: none;">
+            <div class="row align-items-center" style="height: 10%;">
+                <div class="head col">Telop</div>
             </div>
-            <div class="col-6">
-                <button type="button" class="switch-btn btn btn-info btn-lg ">next</button>
+
+            <div id="auto-field" class="row  px-3" style="height: 80%; ">
+                <div class="input-div col-6 col-sm-3">
+                    <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
+                        <div>Speaker</div>
+                        <div>10</div>
+                    </button>
+
+                </div>
+                <div class="input-div col-6 col-sm-3">
+                    <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
+                        <div>Echo</div>
+                        <div>10</div>
+                    </button>
+
+                </div>
+                <div class="input-div col-6 col-sm-3">
+                    <button type="button" class="count-btn btn btn-warning btn-lg btn-block m-auto ">
+                        <div>fortissiom</div>
+                        <div>10</div>
+                    </button>
+
+                </div>
+                <div class="input-div col-6 col-sm-3 align-self:bottom">
+                    <button type="button" class="count-btn btn btn-danger btn-lg btn-block m-auto ">
+                        <div>Decrease</div>
+                    </button>
+
+                </div>
+            </div>
+            <div class="row align-items-center" style="height: 10%;">
+                <div class="col-6">
+                    <button type="button" class="switch-btn btn btn-info btn-lg"
+                        onclick="swipePage(-1)">previous</button>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="switch-btn btn btn-info btn-lg" onclick="swipePage(1)">next</button>
+                </div>
             </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+    <script src="scripts/main.js"></script>
 </body>
 
 </html>
