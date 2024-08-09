@@ -1,4 +1,7 @@
 var slide = 0;
+var config = {
+    "decrease-leave": "auto"
+}
 function swipePage(increment) {
     previousSlide = slide
     slides = document.getElementById("main-holder").children
@@ -44,9 +47,13 @@ init = function () {
                     score_div.innerText = parseInt(score_div.innerText) + 1;
                 }
                 else {
-                    score_div.innerText = parseInt(score_div.innerText) - 1;
-                    this.parentElement.parentElement.querySelector("#decrease-btn").classList.toggle("active");
-                    this.parentElement.parentElement.querySelector("#decrease-btn").innerText = "Decrease";
+                    if (parseInt(score_div.innerText) > 0) {
+                        score_div.innerText = parseInt(score_div.innerText) - 1;
+                    }
+                    if (config["decrease-leave"] == "auto") {
+                        this.parentElement.parentElement.querySelector("#decrease-btn").classList.toggle("active");
+                        this.parentElement.parentElement.querySelector("#decrease-btn").innerText = "Decrease";
+                    }
                 }
             });
         });
