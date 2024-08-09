@@ -15,22 +15,37 @@ function swipePage(increment) {
 
     }
 }
-document.getElementById("auto-leave-select").addEventListener("click", function (e) {
-    console.log(e);
-    console.log(" ddefef");
-    Array.from(document.getElementById("auto-leave-select").children).forEach(function (element) {
-        if (element == e.target) {
-            element.classList.remove("btn-secondary");
-            element.classList.add("btn-info");
-            document.getElementById("auto-leave-select").value = element.value;
-            console.log(element);
-        }
-        else {
-            element.classList.remove("btn-info");
-            element.classList.add("btn-secondary");
-        };
+document.querySelectorAll(".select-btn-group").forEach(function (element) {
+    element.addEventListener("click", function (e) {
+        Array.from(element.children).forEach(function (element) {
+            if (element == e.target) {
+                element.classList.remove("btn-secondary");
+                element.classList.add("btn-info");
+                config[element.parentElement.id] = element.value;
+            }
+            else {
+                element.classList.remove("btn-info");
+                element.classList.add("btn-secondary");
+            };
+        });
     });
 });
+// document.getElementById("auto-leave-select").addEventListener("click", function (e) {
+//     console.log(e);
+//     console.log(" ddefef");
+//     Array.from(document.getElementById("auto-leave-select").children).forEach(function (element) {
+//         if (element == e.target) {
+//             element.classList.remove("btn-secondary");
+//             element.classList.add("btn-info");
+//             document.getElementById("auto-leave-select").value = element.value;
+//             console.log(element);
+//         }
+//         else {
+//             element.classList.remove("btn-info");
+//             element.classList.add("btn-secondary");
+//         };
+//     });
+// });
 
 init = function () {
 
