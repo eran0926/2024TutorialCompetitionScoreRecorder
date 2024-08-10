@@ -5,7 +5,7 @@ var initialX = null;
 var xThreshold = 0.3;
 var slide = 0;
 var config = {
-    "decrease-leave": "auto"
+    "decrease-leave": "manual"
 }
 
 function swipePage(increment) {
