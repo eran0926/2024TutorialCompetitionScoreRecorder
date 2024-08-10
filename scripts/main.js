@@ -1,7 +1,13 @@
+document.addEventListener("touchstart", startTouch, false);
+document.addEventListener("touchend", moveTouch, false);
+
+var initialX = null;
+var xThreshold = 0.3;
 var slide = 0;
 var config = {
     "decrease-leave": "auto"
 }
+
 function swipePage(increment) {
     previousSlide = slide
     slides = document.getElementById("main-holder").children
@@ -15,6 +21,30 @@ function swipePage(increment) {
 
     }
 }
+
+function startTouch(e) {
+    initialX = e.touches[0].screenX;
+};
+
+function moveTouch(e) {
+    if (initialX === null) {
+        return;
+    }
+
+    var currentX = e.changedTouches[0].screenX;
+    var diffX = initialX - currentX;
+
+    // sliding horizontally
+    if (diffX / screen.width > xThreshold) {
+        // swiped left
+        swipePage(1);
+    } else if (diffX / screen.width < -xThreshold) {
+        // swiped right
+        swipePage(-1);
+    }
+    initialX = null;
+};
+
 document.querySelectorAll(".select-btn-group").forEach(function (element) {
     element.addEventListener("click", function (e) {
         Array.from(element.children).forEach(function (element) {
@@ -89,3 +119,8 @@ init = function () {
 
 
 window.onload = init()
+
+
+
+
+
