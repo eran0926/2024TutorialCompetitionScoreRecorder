@@ -90,9 +90,26 @@ body {
 
 .select-btn-group {
     height: 40%;
+    /* overflow-x: hidden; */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .select-btn-group button {
+    padding-left: 0;
+    padding-right: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    /* --bs-btn-padding-x: auto; */
+}
+
+.form-group label {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
 }
