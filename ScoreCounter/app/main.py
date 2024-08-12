@@ -73,7 +73,7 @@ def index():
     return redirect(url_for("counter"))
 
 @app.route('/counter')
-@login_required
+# @login_required
 def counter():
     return render_template("counter.html")
 
@@ -86,10 +86,19 @@ def test():
 def connect():
     print("\n",request)
     print("\n",request.sid)
-    print("\n",request.args["token"])
-    # if not self.authenticate(request.args):
-    #     raise ConnectionRefusedError('unauthorized!')
-
+    print("\n",request.args)
+    if not current_user.is_authenticated:
+        raise ConnectionRefusedError('unauthorized!')
+    
+    print("connected")
+    socketio.emit('sync_game_status', {
+    "matchLevel":"practice",
+    "matchNumber": 555,
+    "matchStatus": "started",
+    "alliance": "blue",
+    "team1": "435t-2",
+    "team2": 12
+})
 
 @socketio.on('message')
 def handle_message(data):

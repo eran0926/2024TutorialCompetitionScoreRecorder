@@ -113,3 +113,15 @@ body {
     flex-direction: column;
     justify-content: space-evenly;
 }
+
+#info-page :not(#start-btn){
+    pointer-events: none;
+}
+
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}
