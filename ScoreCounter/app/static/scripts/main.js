@@ -67,18 +67,26 @@ function moveTouch(e) {
 function update_score(elementId, score) {
     const cooectionId = socket.id;
     socket.emit("update_score", {
-        id: elementId,
-        score: score,
         from: cooectionId,
+        data: [
+            {
+                id: elementId,
+                score: score
+            }
+        ]
     });
 }
 
 function update_selection(elementId, choice) {
     const cooectionId = socket.id;
     socket.emit("update_selection", {
-        id: elementId,
-        choice: choice,
         from: cooectionId,
+        data: [
+            {
+                id: elementId,
+                choice: choice
+            }
+        ]
     });
 }
 
@@ -245,8 +253,9 @@ function setSocket() {
         if (msg.from == socket.id) {
             return;
         }
-        document.getElementById(msg.id).querySelector(".score-div").innerText =
-            msg.score;
+        msg.data.forEach(function (element) {
+            document.getElementById(element.id).querySelector(".score-div").innerText = element.score;
+        })
     });
 
     socket.on("update_selection", function (msg) {
@@ -254,16 +263,16 @@ function setSocket() {
         if (msg.from == socket.id) {
             return;
         }
-        Array.from(document.getElementById(msg.id).children).forEach(function (
-            element
-        ) {
-            if (element.value == msg.choice) {
-                element.classList.remove("btn-secondary");
-                element.classList.add("btn-info");
-            } else {
-                element.classList.remove("btn-info");
-                element.classList.add("btn-secondary");
-            }
+        msg.data.forEach(function (element) {
+            Array.from(document.getElementById(element.id).children).forEach(function (child) {
+                if (child.value == element.choice) {
+                    child.classList.remove("btn-secondary");
+                    child.classList.add("btn-info");
+                } else {
+                    child.classList.remove("btn-info");
+                    child.classList.add("btn-secondary");
+                }
+            });
         });
     });
 }
