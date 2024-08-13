@@ -196,31 +196,41 @@ def update_selection(data):
     print(data)
 
 
+@socketio.on('sync_match_state', namespace='/management')
+def sync_match_state():
+    emit('sync_match_state', match.state)
+
+
 @socketio.on('load_match', namespace='/management')
 def load_match(data):
     match_data = db.load_match_data(data["level"], data["id"])
     match.loadMatch(match_data)
     match.state = "preparing"
+    print("load match")
     sync_match_info("red")
     sync_match_info("blue")
 
 
 @socketio.on('start_match', namespace='/management')
 def start_match(data):
+    global gameTimer
     if match.state != "preparing":
+        emit('wrong_state', 'Match is not in preparing state')
         return
-    if data.level != match.level or data.id != match.id:
+    if data["level"] != match.level or int(data["id"]) != match.id:
+        emit('wrong_match', 'Match level or number is not correct')
         return
     match.state = "started"
     emit('match_start', brocast=True)
     emit('match_start', namespace='/management')
-    global gameTimer
+    print("match started")
     gameTimer = Timer(10, end_match)
     gameTimer.start()
 
 
 @socketio.on('stop_match', namespace='/management')
 def stop_match(data):
+    global gameTimer
     gameTimer.cancel()
     end_match()
 
@@ -228,7 +238,8 @@ def stop_match(data):
 def end_match(interrupted=False):
     match.state = "ended"
     socketio.emit('match_end')
-    socketio.emit('match_end', namespace='/management')
+    socketio.emit('match_end', {"level": match.level,
+                  "id": match.id}, namespace='/management')
     # Todo: save match data to database
     match.reset()
 

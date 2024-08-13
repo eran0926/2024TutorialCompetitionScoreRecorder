@@ -1,8 +1,8 @@
 import mariadb
 import sys
 
-match_level = ["Practice", "Qualification", "Playoff"]
-match_state = ["Not Started", "Preparing", "Running", "Ended"]
+match_level_table = ["Practice", "Qualification", "Playoff"]
+match_state_table = ["Not Started", "Preparing", "Running", "Ended"]
 
 
 def connect():
@@ -89,11 +89,10 @@ class DBOperator:
         self.cur.execute("SELECT * FROM match_info")
 
         matches_info = list(self.cur.fetchall())
-        print(matches_info)
         for index, match_info in enumerate(matches_info):
             matches_info[index] = list(match_info)
-            matches_info[index][0] = match_level[match_info[0]]
-            matches_info[index][6] = match_state[match_info[6]]
+            matches_info[index][0] = match_level_table[match_info[0]]
+            matches_info[index][6] = match_state_table[match_info[6]]
 
         return matches_info
 
@@ -105,8 +104,8 @@ class DBOperator:
 
         match_info = self.cur.fetchone()
         match_info = list(match_info)
-        match_info[0] = match_level[match_info[0]]
-        match_info[6] = match_state[match_info[6]]
+        match_info[0] = match_level_table[match_info[0]]
+        match_info[6] = match_state_table[match_info[6]]
 
         return match_info
 
