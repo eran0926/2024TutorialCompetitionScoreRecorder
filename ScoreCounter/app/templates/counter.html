@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{url_for('static',filename='styles/bootstrap.min.css')}}">
 
     <!-- <link href="styles/main.css" rel="stylesheet"> -->
-    <link rel="stylesheet" href="{{url_for('static',filename='styles/main.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='styles/counter.css')}}">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
         integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
@@ -23,7 +23,7 @@
         <div class="container-fluid vh-100">
             <div class="row align-items-center text-center" style="height: 10%;">
                 <div class="head col">Info</div>
-                <div class="col" style="color: white;">Status:<span class="connection-status">Disconnected</span></div>
+                <div class="col" style="color: white;">State:<span class="connection-state">Disconnected</span></div>
             </div>
 
             <div id="info-page" class="row  px-3" style="height: 80%; ">
@@ -35,10 +35,9 @@
                     </div>
                     <div id="level-select" class="select-btn-group btn-group w-100" role="group"
                         aria-label="Basic example">
-                        <button type="button" class="btn btn-secondary btn-lg" value="practice">Practice</button>
-                        <button type="button" class="btn btn-secondary btn-lg"
-                            value="qulifaction">Qualification</button>
-                        <button type="button" class="btn btn-secondary btn-lg" value="playoff">Playoff</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="0">Practice</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="1">Qualification</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="2">Playoff</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -57,8 +56,8 @@
 
                     <div id="alliance-select" class="select-btn-group btn-group w-100" role="group"
                         aria-label="Basic example">
-                        <button type="button" class="btn btn-secondary btn-lg" value="blue">Blue</button>
                         <button type="button" class="btn btn-secondary btn-lg" value="red">Red</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="blue">Blue</button>
                     </div>
                 </div>
                 <div class="select-group input-div col-12">
@@ -75,7 +74,7 @@
                 </div>
                 <div class="select-group input-div col-12">
                     <div class="select-label">
-                        Team1
+                        Team2
                     </div>
                     <div id="team2-select" class="select-btn-group btn-group w-100" role="group"
                         aria-label="Basic example">
@@ -104,7 +103,7 @@
         <div class="container-fluid text-center vh-100">
             <div class="row align-items-center" style="height: 10%;">
                 <div class="head col">Autonomous</div>
-                <div class="col" style="color: white;">Status:<span class="connection-status">Disconnected</span></div>
+                <div class="col" style="color: white;">State:<span class="connection-state">Disconnected</span></div>
             </div>
 
             <div id="auto-input" class="row  px-3" style="height: 80%; ">
@@ -186,7 +185,7 @@
         <div class="container-fluid text-center vh-100">
             <div class="row align-items-center" style="height: 10%;">
                 <div class="head col">Telop</div>
-                <div class="col" style="color: white;">Status:<span class="connection-status">Disconnected</span></div>
+                <div class="col" style="color: white;">State:<span class="connection-state">Disconnected</span></div>
             </div>
 
             <div id="telop-field" class="row  px-3" style="height: 80%; ">
@@ -262,14 +261,16 @@
                         onclick="swipePage(-1)">previous</button>
                 </div>
                 <div class="col-6">
-                    <button type="button" class="switch-btn btn btn-info btn-lg" onclick="swipePage(1)">next</button>
+                    <!-- <button type="button" class="switch-btn btn btn-info btn-lg" onclick="swipePage(1)">next</button> -->
+                    <button id="commit-btn" type="button" class="switch-btn btn btn-info btn-lg" onclick="commit()"
+                        disabled>Commit</button>
                 </div>
             </div>
         </div>
     </div>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
     <script src="{{url_for('static',filename='scripts/bootstrap.bundle.min.js')}}"></script>
-    <script src="static/scripts/main.js"></script>
+    <script src="static/scripts/counter.js"></script>
 </body>
 
 </html>

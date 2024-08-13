@@ -7,7 +7,7 @@ var slide = 0;
 var config = {
     "decrease-leave": "manual",
 };
-var gameStatus = "stop";
+var gameState = "stop";
 
 function swipePage(increment) {
     previousSlide = slide;
@@ -65,9 +65,9 @@ function moveTouch(e) {
 // });
 
 function update_score(elementId, score) {
-    const cooectionId = socket.id;
+    const connection = socket.id;
     socket.emit("update_score", {
-        from: cooectionId,
+        from: connection,
         data: [
             {
                 id: elementId,
@@ -78,9 +78,9 @@ function update_score(elementId, score) {
 }
 
 function update_selection(elementId, choice) {
-    const cooectionId = socket.id;
+    const connection = socket.id;
     socket.emit("update_selection", {
-        from: cooectionId,
+        from: connection,
         data: [
             {
                 id: elementId,
@@ -88,6 +88,22 @@ function update_selection(elementId, choice) {
             }
         ]
     });
+}
+
+// function start() {
+//     if (gameState == "started") {
+//         document.getElementById("start-btn").disabled = false;
+
+//         // swipePage(1);
+//     }
+// }
+
+
+function commit() {
+    // const connection = socket.id;
+    socket.emit("commit", '')
+    socket.emit("", {});
+    window.location.reload();
 }
 
 function setEventListener() {
@@ -160,20 +176,14 @@ function setEventListener() {
 
 }
 
-function start() {
-    if (gameStatus == "started") {
-        document.getElementById("start-btn").disabled = false;
 
-        // swipePage(1);
-    }
-}
 
 function setSocket() {
     socket = io.connect();
 
     socket.on("connect", () => {
         console.log("connected");
-        Array.from(document.getElementsByClassName("connection-status")).forEach(
+        Array.from(document.getElementsByClassName("connection-state")).forEach(
             function (element) {
                 element.classList.remove("danger");
                 element.innerText = "Connected";
@@ -183,7 +193,7 @@ function setSocket() {
     });
 
     socket.on("disconnect", () => {
-        Array.from(document.getElementsByClassName("connection-status")).forEach(
+        Array.from(document.getElementsByClassName("connection-state")).forEach(
             function (element) {
                 element.classList.remove("success");
                 element.innerText = "Disconnected";
@@ -192,11 +202,11 @@ function setSocket() {
         );
     });
 
-    socket.on("sync_game_status", function (msg) {
-        gameStatus = msg.matchStatus;
-        console.log(gameStatus);
-        if (gameStatus != "started") {
-            console.log(gameStatus);
+    socket.on("sync_match_info", function (msg) {
+        gameState = msg.matchState;
+        console.log(gameState);
+        if (gameState != "started") {
+            console.log(gameState);
             document.getElementById("start-btn").disabled = true;
         } else {
             document.getElementById("start-btn").disabled = false;
@@ -239,13 +249,13 @@ function setSocket() {
         );
     });
 
-    socket.on("gaem_start", function (msg) {
-        gameStatus = "started";
+    socket.on("match_start", function (msg) {
+        gameState = "started";
         swipePage(1);
     });
-    socket.on("game_stop", function (msg) {
-        gameStatus = "finished";
-        window.location.reload();
+    socket.on("match_end", function (msg) {
+        gameState = "finished";
+        document.getElementById("commit-btn").disabled = false;
     });
 
     socket.on("update_score", function (msg) {
@@ -277,7 +287,7 @@ function setSocket() {
     });
 }
 
-// function syncGameStatus(msg) { }
+// function syncGameState(msg) { }
 
 function init() {
     console.log("init");

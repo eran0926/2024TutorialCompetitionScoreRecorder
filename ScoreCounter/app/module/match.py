@@ -91,19 +91,35 @@ class Score:
 
     class Penalty:
         def __init__(self):
-            self.foul = 0
-            self.techFoul = 0
+            self.auto = self.Auto()
+            self.telop = self.Telop()
+            self.auto.foul = 0
+            self.auto.techFoul = 0
+            self.telop.foul = 0
+            self.telop.techFoul = 0
             self.points = 0
 
         def reset(self):
-            self.foul = 0
-            self.techFoul = 0
+            self.auto.foul = 0
+            self.auto.techFoul = 0
+            self.telop.foul = 0
+            self.telop.techFoul = 0
             self.points = 0
 
         def countScore(self):
             self.points = 0
-            self.points += self.foul*5
-            self.points += self.techFoul*8
+            self.points += (self.auto.foul + self.telop.foul)*5
+            self.points += (self.telop.foul + self.telop.techFoul)*8
+
+        class Auto:
+            def __init__(self):
+                self.foul = 0
+                self.techFoul = 0
+
+        class Telop:
+            def __init__(self):
+                self.foul = 0
+                self.techFoul = 0
 
     class RankingPoints:
         def __init__(self):
@@ -132,26 +148,78 @@ class Alliance:
         self.team1 = team1
         self.team2 = team2
 
+    def recorderIdToObject(self, id):
+        recorderIdToObjectTable = {
+            "team1-select": self.team1,
+            "team2-select": self.team2,
+            "auto-leave-select1": self.score.auto.leave1,
+            "auto-leave-select2": self.score.auto.leave2,
+            "auto-speaker-btn": self.score.auto.speaker,
+            "auto-echo-btn": self.score.auto.echo,
+            "auto-foul-btn": self.score.penalty.auto.foul,
+            "auto-tech-foul-btn": self.score.penalty.auto.techFoul,
+            "telop-speaker-btn": self.score.telop.speaker,
+            "telop-echo-btn": self.score.telop.echo,
+            "telop-fortissimo-btn": self.score.telop.fortissiom,
+            "telop-park-select1": self.score.telop.park1,
+            "telop-park-select2": self.score.telop.park2,
+            "telop-foul-btn": self.score.penalty.telop.foul,
+            "telop-tech-foul-btn": self.score.penalty.telop.techFoul
+        }
+
+        return recorderIdToObjectTable[id]
+
 
 class Match:
     def __init__(self):
-        self.status = "preparing"
+        self.state = "preparing"
         self.level = ""
         self.id = 0
-        self.blue = Alliance()
         self.red = Alliance()
+        self.blue = Alliance()
+        self.alliance = {"red": self.red, "blue": self.blue}
+        self.recorder = ()
+        self.commitedRecorder = ()
 
     def reset(self):
-        self.status = "preparing"
+        self.state = "preparing"
         self.level = ""
         self.id = 0
-        self.blue.reset()
         self.red.reset()
+        self.blue.reset()
+        self.recorder = set()
+        self.commitedRecorder = set()
+
+    def allCommited(self):
+        return self.recorder == self.commitedRecorder
+
+    def recorderIdToObject(self, id):
+        recorderIdToObjectTable = {
+            "level-select": self.level,
+            "matchNumberInput": self.id,
+        }
+        return recorderIdToObjectTable[id]
+
+    def loadMatch(self, match_data):
+        self.reset()
+        # self.level = match_data["level"]
+        # self.id = match_data["id"]
+        # self.red.setTeam(match_data["red"]["team1"],
+        #                  match_data["red"]["team2"])
+        # self.blue.setTeam(match_data["blue"]["team1"],
+        #                   match_data["blue"]["team2"])
+        self.level = match_data[0]
+        self.id = match_data[1]
+        self.red.setTeam(match_data[2],
+                         match_data[3])
+        self.blue.setTeam(match_data[4],
+                          match_data[5])
 
 
 if __name__ == "__main__":
     m = Match()
     m.level = "aaa"
     print(m.level)
+    print(type(m.__dict__["blue"]) == type(classmethod))
     m.reset()
-    print(m.level)
+    print(m[""])

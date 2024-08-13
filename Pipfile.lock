@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6418fb758e78d5bca77959de266ec12e2596b430b7f8bf7ad27820d8579f4405"
+            "sha256": "cbf728d01837a89d1e2361d15850379b0a8a32f8c303210f49aa14685cec74f0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -99,6 +99,24 @@
             "markers": "python_version >= '3.7'",
             "version": "==3.1.4"
         },
+        "mariadb": {
+            "hashes": [
+                "sha256:03d6284ef713d1cad40146576a4cc2d6cbc1662060f2a0e59b174e1694521698",
+                "sha256:1ce87971c02375236ff8933e6c593c748e7b2f2950b86eabfab4289fd250ea63",
+                "sha256:1d81b22efbaaf4c5bc5e4cc4e2ef3c459538c1a939371089d8c5591d6f26a62e",
+                "sha256:29040e426f877ddc45f337c6eb381b6bbab63cc6bf8431a28effe30162142513",
+                "sha256:4521aa721f926946bd71491f872e8babc78fa97755ed2114f5684b77363107cb",
+                "sha256:49200378c614984f5ec875481662a49d7c97c2be27970b01b32fa4b7520d4e22",
+                "sha256:5d652117e2fdf12b9723e7452a05fce9e6ccbae6ea48871b21a3a8fde259dc48",
+                "sha256:8c8c6b27486b0e1772a23002c702b5fd244eecf9f05633dd6cb345fc26755a20",
+                "sha256:a332893e3ef7ceb7970ab4bd7c844bcb4bd68a051ca51313566f9808d7411f2d",
+                "sha256:d7b09ec4abd02ed235257feb769f90cd4066e8f536b55b92f5166103d5b66a63",
+                "sha256:dff8b28ce4044574870d7bdd2d9f9f5da8e5f95a7ff6d226185db733060d1a93"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==1.1.10"
+        },
         "markupsafe": {
             "hashes": [
                 "sha256:00e046b6dd71aa03a41079792f8473dc494d564611a8f89bbbd7cb93295ebdcf",
@@ -164,6 +182,14 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==2.1.5"
+        },
+        "packaging": {
+            "hashes": [
+                "sha256:026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002",
+                "sha256:5b8f2217dbdbd2f7f384c41c628544e6d52f2d0f53c6d0c3ea61aa5d1d7ff124"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==24.1"
         },
         "python-engineio": {
             "hashes": [
