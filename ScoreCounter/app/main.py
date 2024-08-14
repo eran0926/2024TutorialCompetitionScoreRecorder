@@ -152,7 +152,6 @@ def connect():
     if not current_user.is_authenticated:
         raise ConnectionRefusedError('unauthorized!')
 
-    print("connected", match.state)
     join_room(current_user.alliance)
     if current_user.role == 1:
         match.recorder.add(request.sid)
@@ -192,9 +191,6 @@ def update_score(msg):
 @socketio.on('commit')
 def commit(msg):
     match.commitedRecorder.add(request.sid)
-    print(match.recorder)
-    print(match.commitedRecorder)
-    print(match.allCommited)
     if match.allCommited:
         match.state = "All Commited"
         db.change_match_state(match.level, match.id, match.state)
@@ -212,7 +208,6 @@ def sync_match_state():
 def load_match(data):
     match.reset()
     match_data = db.load_match_data(data["level"], data["id"])
-    print(match_data)
     match.loadMatch(match_data)
     match.state = "Preparing"
     db.change_match_state(match.level, match.id, match.state)
