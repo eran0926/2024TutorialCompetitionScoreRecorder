@@ -18,42 +18,6 @@ match = Match()
 
 db = DBOperator()
 
-# users = {
-#     'admin': {
-#         'password': 'admin',
-#         'role': '0',
-#         'alliance': 'admin'
-#     },
-#     'r1': {
-#         'password': '1',
-#         'role': '1',
-#         'alliance': 'red'
-#     },
-#     'r2': {
-#         'password': '1',
-#         'role': '1',
-#         'alliance': 'red'
-#     },
-#     'b1': {
-#         'password': '1',
-#         'role': '1',
-#         'alliance': 'blue'
-#     },
-#     'b2': {
-#         'password': '1',
-#         'role': '1',
-#         'alliance': 'blue'
-#     }
-# }
-
-
-# def debug_decorator(func):
-#     def wrapper(*args, **kwargs):
-#         print("function", func.__name__, "called")
-#         print("args", *args)
-#         print("kwargs", **kwargs)
-#         return func(*args, **kwargs)
-#     return wrapper
 
 debug_counter = 0
 
@@ -63,13 +27,9 @@ def debug_decorator(func):
     def wrapper(*args, **kwargs):
         global debug_counter
         debug_counter += 1
-        # print("------------------------------------")
         print("function", func.__name__, "called", debug_counter)
-        # print("args", *args)
-        # print("kwargs", **kwargs)
         re = func(*args, **kwargs)
         print("function", func.__name__, "end", debug_counter)
-        # print("------------------------------------")
         return re
     return wrapper
 
@@ -84,14 +44,10 @@ def user_loader(username):
  設置二： 透過這邊的設置讓flask_login可以隨時取到目前的使用者id   
  :param email:官網此例將email當id使用，賦值給予user.id    
  """
-    print("user_loader", username)
-    # usernames = db.get_all_username()
-    usernames = ["r1", "r2", "b1", "b2"]
+    usernames = db.get_all_username()
     if not username in usernames:
         return None
-    print("get_user_start")
     user_info = db.get_user(username)
-    print("get_user_end")
 
     user = User()
     user.id = user_info[1]
@@ -103,7 +59,6 @@ def user_loader(username):
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
-    print("request.path", request.path)
     return redirect(url_for("login"))
     # return redirect('/login?next=' + request.path)
 
@@ -140,7 +95,6 @@ def logout():
  logout\_user會將所有的相關session資訊給pop掉 
  """
     logout_user()
-    # return 'Logged out'
     return redirect(url_for('index'))
 
 
@@ -162,7 +116,6 @@ def scoreboard():
 
 @app.route('/simpleManagement')
 def simpleManagement():
-    print(db.get_matches_info())
     return render_template("simpleManagement.html", matches_info=db.get_matches_info())
 
 
@@ -175,8 +128,7 @@ def control():
 
 @app.route('/test')
 def test():
-    return render_template("login copy.html")
-    # return render_template("test2.html")
+    return render_template("test.html")
 
 
 @app.route('/test2')
@@ -204,7 +156,6 @@ def connect():
     join_room(current_user.alliance)
     if current_user.role == 1:
         match.recorder.add(request.sid)
-    # sync_match_info(current_user.alliance)
     emit('sync_match_info', {
         "matchLevel": match.level,
         "matchNumber": match.id,
@@ -289,7 +240,6 @@ def start_match(data):
     emit('match_start', namespace='/management')
     gameTimer = Timer(10, end_match)
     gameTimer.start()
-    print("match started")
 
 
 @socketio.on('interrupt_match', namespace='/management')
@@ -310,7 +260,6 @@ def end_match():
     socketio.emit('match_end')
     socketio.emit('match_end', {"level": match.level,
                   "id": match.id}, namespace='/management')
-    # match.reset()
 
 
 @socketio.on('save_and_show', namespace='/management')
