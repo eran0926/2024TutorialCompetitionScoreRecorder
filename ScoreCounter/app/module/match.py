@@ -1,3 +1,24 @@
+from module.utils import get_nested_attribute
+
+recorderIdToObjectNameTable = {
+    "team1-select": "team1",
+    "team2-select": "team2",
+    "auto-leave-select1": "score.auto.leave1",
+    "auto-leave-select2": "score.auto.leave2",
+    "auto-speaker-btn": "score.auto.speaker",
+    "auto-echo-btn": "score.auto.echo",
+    "auto-foul-btn": "score.penalty.auto.foul",
+    "auto-tech-foul-btn": "score.penalty.auto.techFoul",
+    "telop-speaker-btn": "score.telop.speaker",
+    "telop-echo-btn": "score.telop.echo",
+    "telop-fortissimo-btn": "score.telop.fortissimo",
+    "telop-park-select1": "score.telop.park1",
+    "telop-park-select2": "score.telop.park2",
+    "telop-foul-btn": "score.penalty.telop.foul",
+    "telop-tech-foul-btn": "score.penalty.telop.techFoul"
+}
+
+
 class Score:
     def __init__(self):
         self.auto = self.Auto()
@@ -57,7 +78,7 @@ class Score:
         def __init__(self):
             self.speaker = 0
             self.echo = 0
-            self.fortissiom = 0
+            self.fortissimo = 0
             self.park1 = 0
             self.park2 = 0
             self.stagePoints = 0
@@ -66,7 +87,7 @@ class Score:
         def reset(self):
             self.speaker = 0
             self.echo = 0
-            self.fortissiom = 0
+            self.fortissimo = 0
             self.park1 = 0
             self.park2 = 0
             self.stagePoints = 0
@@ -87,7 +108,7 @@ class Score:
 
             self.points += self.stagePoints
             self.points += self.speaker*5
-            self.points += self.echo*(self.fortissiom+1)
+            self.points += self.echo*(self.fortissimo+1)
 
     class Penalty:
         def __init__(self):
@@ -148,49 +169,71 @@ class Alliance:
         self.team1 = team1
         self.team2 = team2
 
-    def recorderIdToObject(self, id):
-        recorderIdToObjectTable = {
-            "team1-select": self.team1,
-            "team2-select": self.team2,
-            "auto-leave-select1": self.score.auto.leave1,
-            "auto-leave-select2": self.score.auto.leave2,
-            "auto-speaker-btn": self.score.auto.speaker,
-            "auto-echo-btn": self.score.auto.echo,
-            "auto-foul-btn": self.score.penalty.auto.foul,
-            "auto-tech-foul-btn": self.score.penalty.auto.techFoul,
-            "telop-speaker-btn": self.score.telop.speaker,
-            "telop-echo-btn": self.score.telop.echo,
-            "telop-fortissimo-btn": self.score.telop.fortissiom,
-            "telop-park-select1": self.score.telop.park1,
-            "telop-park-select2": self.score.telop.park2,
-            "telop-foul-btn": self.score.penalty.telop.foul,
-            "telop-tech-foul-btn": self.score.penalty.telop.techFoul
-        }
+    def countScore(self):
+        self.score.countScore()
 
-        return recorderIdToObjectTable[id]
+    def get_all_recorder_data(self):
+        recorder_datas = []
+        for key in recorderIdToObjectNameTable:
+            recorder_data = {}
+            recorder_data["id"] = key
+            recorder_data["data"] = key
+            get_nested_attribute(
+                self, recorderIdToObjectNameTable[key])
+        return recorder_datas
+
+    # def recorderIdToObject(self, id):
+    #     recorderIdToObjectNameTable = {
+    #         "team1-select": self.team1,
+    #         "team2-select": self.team2,
+    #         "auto-leave-select1": self.score.auto.leave1,
+    #         "auto-leave-select2": self.score.auto.leave2,
+    #         "auto-speaker-btn": self.score.auto.speaker,
+    #         "auto-echo-btn": self.score.auto.echo,
+    #         "auto-foul-btn": self.score.penalty.auto.foul,
+    #         "auto-tech-foul-btn": self.score.penalty.auto.techFoul,
+    #         "telop-speaker-btn": self.score.telop.speaker,
+    #         "telop-echo-btn": self.score.telop.echo,
+    #         "telop-fortissimo-btn": self.score.telop.fortissimo,
+    #         "telop-park-select1": self.score.telop.park1,
+    #         "telop-park-select2": self.score.telop.park2,
+    #         "telop-foul-btn": self.score.penalty.telop.foul,
+    #         "telop-tech-foul-btn": self.score.penalty.telop.techFoul
+    #     }
+
+    #     return recorderIdToObjectTable[id]
 
 
 class Match:
     def __init__(self):
-        self.state = "preparing"
+        self.state = "Not Started"
         self.level = ""
         self.id = 0
         self.red = Alliance()
         self.blue = Alliance()
         self.alliance = {"red": self.red, "blue": self.blue}
-        self.recorder = ()
-        self.commitedRecorder = ()
+        self.recorder = set()
+        self.commitedRecorder = set()
+        # self.recorder = list()
+        # self.commitedRecorder = list()
 
     def reset(self):
-        self.state = "preparing"
+        self.state = "Not Started"
         self.level = ""
         self.id = 0
         self.red.reset()
         self.blue.reset()
-        self.recorder = set()
+        # self.commitedRecorder = list()
+        # self.recorder = set()
         self.commitedRecorder = set()
 
+    def countScore(self):
+        self.red.countScore()
+        self.blue.countScore()
+
     def allCommited(self):
+        # self.recorder.sort()
+        # self.commitedRecorder.sort()
         return self.recorder == self.commitedRecorder
 
     def recorderIdToObject(self, id):
@@ -199,6 +242,13 @@ class Match:
             "matchNumberInput": self.id,
         }
         return recorderIdToObjectTable[id]
+
+    def get_all_recorder_data(self, alliance):
+        if alliance == "red":
+            return self.red.get_all_recorder_data()
+        elif alliance == "blue":
+            return self.blue.get_all_recorder_data()
+        return []
 
     def loadMatch(self, match_data):
         self.reset()

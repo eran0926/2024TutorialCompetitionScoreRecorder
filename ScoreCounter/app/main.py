@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, emit, join_room, leave_room, ConnectionRefusedError
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required, logout_user
 from threading import Timer
-from module.match import Match
+from module.match import Match, recorderIdToObjectNameTable
 from module.db_operator import DBOperator
+from module.utils import get_nested_attribute, set_nested_attribute
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -55,10 +56,11 @@ def user_loader(username):
  設置二： 透過這邊的設置讓flask_login可以隨時取到目前的使用者id   
  :param email:官網此例將email當id使用，賦值給予user.id    
  """
+    print("user_loader", username)
     usernames = db.get_all_username()
+    # usernames = ["r1", "r2", "b1", "b2"]
     if not username in usernames:
         return None
-    print("user_loader", username)
 
     user_info = db.get_user(username)
 
@@ -169,8 +171,10 @@ def connect():
     if not current_user.is_authenticated:
         raise ConnectionRefusedError('unauthorized!')
 
-    print("connected")
+    print("connected", match.state)
     join_room(current_user.alliance)
+    if current_user.role == 1:
+        match.recorder.add(request.sid)
     # sync_match_info(current_user.alliance)
     emit('sync_match_info', {
         "matchLevel": match.level,
@@ -180,20 +184,43 @@ def connect():
         "team1": match.alliance[current_user.alliance].team1,
         "team2": match.alliance[current_user.alliance].team2,
     })
+    emit('update_value', {
+        "from": "host",
+        "data": match.get_all_recorder_data(current_user.alliance)
+    })
 
 
-@socketio.on('update_score')
-def update_score(data):
-    emit('update_score', data, to=current_user.alliance)
-    # print('received message: ' + data)
-    print("send to alliance: ", current_user.alliance)
+@socketio.on('disconnect')
+def disconnect():
+    if current_user.role == 1:
+        match.recorder.remove(request.sid)
+        if request.sid in match.commitedRecorder:
+            match.commitedRecorder.remove(request.sid)
 
 
-@socketio.on('update_selection')
-def update_selection(data):
-    emit('update_selection', data, to=current_user.alliance)
-    print("send to alliance: ", current_user.alliance)
-    print(data)
+@socketio.on('update_value')
+def update_score(msg):
+    emit('update_value', msg, to=current_user.alliance)
+    for data in msg["data"]:
+        attr_name = current_user.alliance + "." + \
+            recorderIdToObjectNameTable[data["id"]]
+        set_nested_attribute(match, attr_name, data["value"])
+    match.countScore()
+    print(match.red.score)
+
+
+@socketio.on('commit')
+def commit(msg):
+    match.commitedRecorder.add(request.sid)
+    print(match.recorder)
+    print(match.commitedRecorder)
+    print(match.allCommited)
+    if match.allCommited:
+        match.state = "All Commited"
+        db.change_match_state(match.level, match.id, match.state)
+        socketio.emit('all_commited', {
+                      "level": match.level, "id": match.id}, namespace='/management')
+        return
 
 
 @socketio.on('sync_match_state', namespace='/management')
@@ -203,10 +230,13 @@ def sync_match_state():
 
 @socketio.on('load_match', namespace='/management')
 def load_match(data):
+    match.reset()
     match_data = db.load_match_data(data["level"], data["id"])
+    print(match_data)
     match.loadMatch(match_data)
-    match.state = "preparing"
-    print("load match")
+    match.state = "Preparing"
+    db.change_match_state(match.level, match.id, match.state)
+    db.reset_other_loaded_match_state(match.level, match.id)
     sync_match_info("red")
     sync_match_info("blue")
 
@@ -214,34 +244,58 @@ def load_match(data):
 @socketio.on('start_match', namespace='/management')
 def start_match(data):
     global gameTimer
-    if match.state != "preparing":
+    if match.state != "Preparing":
         emit('wrong_state', 'Match is not in preparing state')
+        print("wrong state")
         return
     if data["level"] != match.level or int(data["id"]) != match.id:
         emit('wrong_match', 'Match level or number is not correct')
+        print("wrong match")
+        print(data["level"], match.level, data["id"], match.id)
         return
-    match.state = "started"
-    emit('match_start', brocast=True)
+    match.state = "Running"
+    db.change_match_state(match.level, match.id, match.state)
+    # emit('match_start', brocast=True)
+    socketio.emit('match_start')
     emit('match_start', namespace='/management')
-    print("match started")
     gameTimer = Timer(10, end_match)
     gameTimer.start()
+    print("match started")
 
 
-@socketio.on('stop_match', namespace='/management')
-def stop_match(data):
+@socketio.on('interrupt_match', namespace='/management')
+def match_interrupted(data):
     global gameTimer
     gameTimer.cancel()
-    end_match()
+    match.state = "Interrupted"
+    db.change_match_state(match.level, match.id, match.state)
+    socketio.emit('match_interrupted')
+    socketio.emit('match_interrupted', {"level": match.level,
+                  "id": match.id}, namespace='/management')
+    match.reset()
 
 
-def end_match(interrupted=False):
-    match.state = "ended"
+def end_match():
+    match.state = "Ended"
+    db.change_match_state(match.level, match.id, match.state)
     socketio.emit('match_end')
     socketio.emit('match_end', {"level": match.level,
                   "id": match.id}, namespace='/management')
-    # Todo: save match data to database
-    match.reset()
+    # match.reset()
+
+
+@socketio.on('save_and_show', namespace='/management')
+def save_and_show(data):
+    match.state = "Saved"
+    db.change_match_state(match.level, match.id, match.state)
+    # TODO: save match data to database
+    # match_result = match.get_result()
+    # socketio.emit('show_result', match_result, to="board")
+    # tmp = match_result.copy()
+    # dict_style_data = match.get_dict_style_data()
+    # tmp.update(dict_style_data)
+    # db.save_match_data(tmp)
+    print("\n\n\nsimulated save and show\n\n\n")
 
 
 if __name__ == '__main__':

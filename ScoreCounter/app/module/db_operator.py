@@ -2,7 +2,19 @@ import mariadb
 import sys
 
 match_level_table = ["Practice", "Qualification", "Playoff"]
-match_state_table = ["Not Started", "Preparing", "Running", "Ended"]
+level_to_num = {"Practice": 0, "Qualification": 1, "Playoff": 2}
+
+match_state_table = ["Not Started", "Preparing",
+                     "Running", "Ended", "All Commited", "Saved", "Interrupted"]
+state_to_num = {
+    "Not Started": 0,
+    "Preparing": 1,
+    "Running": 2,
+    "Ended": 3,
+    "All Commited": 4,
+    "Saved": 5,
+    "Interrupted": 6
+}
 
 
 def connect():
@@ -18,7 +30,7 @@ def connect():
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
         sys.exit(1)
-    conn.autocommit = True
+    # conn.autocommit = True
     return conn.cursor()
 
 # Get Cursor
@@ -99,6 +111,8 @@ class DBOperator:
     def load_match_data(self, match_level, match_id):
         """Retrieves a match from the database"""
 
+        match_level = level_to_num[match_level]
+
         self.cur.execute(
             "SELECT * FROM match_info WHERE level = ? AND id = ?", (match_level, match_id))
 
@@ -108,6 +122,24 @@ class DBOperator:
         match_info[6] = match_state_table[match_info[6]]
 
         return match_info
+
+    def change_match_state(self, match_level, match_id, state):
+        """Change match state in the database"""
+        if type(state) == str and state in state_to_num.keys():
+            state = state_to_num[state]
+
+        match_level = level_to_num[match_level]
+
+        self.cur.execute(
+            "UPDATE match_info SET state = ? WHERE level = ? AND id = ?", (state, match_level, match_id))
+
+    def reset_other_loaded_match_state(self, match_level, match_id):
+        """Reset other loaded match state in the database"""
+
+        match_level = level_to_num[match_level]
+
+        self.cur.execute(
+            "UPDATE match_info SET state = ? WHERE level != ? OR id != ? AND state = ?", (0, match_level, match_id, 1))
 
     def close(self):
         self.cur.close()

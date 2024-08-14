@@ -7,7 +7,7 @@ var slide = 0;
 var config = {
     "decrease-leave": "manual",
 };
-var gameState = "stop";
+var gameState = "Not Started";
 
 function swipePage(increment) {
     previousSlide = slide;
@@ -66,12 +66,12 @@ function moveTouch(e) {
 
 function update_score(elementId, score) {
     const connection = socket.id;
-    socket.emit("update_score", {
+    socket.emit("update_value", {
         from: connection,
         data: [
             {
                 id: elementId,
-                score: score
+                value: score
             }
         ]
     });
@@ -79,16 +79,25 @@ function update_score(elementId, score) {
 
 function update_selection(elementId, choice) {
     const connection = socket.id;
-    socket.emit("update_selection", {
+    socket.emit("update_value", {
         from: connection,
         data: [
             {
                 id: elementId,
-                choice: choice
+                value: choice
             }
         ]
     });
 }
+
+function update_match_state() {
+    Array.from(document.getElementsByClassName("match-state")).forEach(
+        function (element) {
+            element.innerText = gameState;
+        }
+    );
+}
+
 
 // function start() {
 //     if (gameState == "started") {
@@ -102,7 +111,6 @@ function update_selection(elementId, choice) {
 function commit() {
     // const connection = socket.id;
     socket.emit("commit", '')
-    socket.emit("", {});
     window.location.reload();
 }
 
@@ -205,12 +213,18 @@ function setSocket() {
     socket.on("sync_match_info", function (msg) {
         gameState = msg.matchState;
         console.log(gameState);
-        if (gameState != "started") {
+        if (gameState != "Running") {
             console.log(gameState);
             document.getElementById("start-btn").disabled = true;
         } else {
             document.getElementById("start-btn").disabled = false;
         }
+        if (gameState != "Ended") {
+            document.getElementById("commit-btn").disabled = true;
+        } else {
+            document.getElementById("commit-btn").disabled = false;
+        }
+        update_match_state();
         Array.from(document.getElementById("level-select").children).forEach(
             function (element) {
                 if (element.value == msg.matchLevel) {
@@ -250,41 +264,67 @@ function setSocket() {
     });
 
     socket.on("match_start", function (msg) {
-        gameState = "started";
+        gameState = "Running";
+        update_match_state();
         swipePage(1);
     });
     socket.on("match_end", function (msg) {
-        gameState = "finished";
+        gameState = "Ended";
+        update_match_state();
         document.getElementById("commit-btn").disabled = false;
     });
 
-    socket.on("update_score", function (msg) {
+    socket.on("update_value", function (msg) {
         console.log(msg);
         if (msg.from == socket.id) {
             return;
         }
-        msg.data.forEach(function (element) {
-            document.getElementById(element.id).querySelector(".score-div").innerText = element.score;
-        })
-    });
-
-    socket.on("update_selection", function (msg) {
-        console.log(msg);
-        if (msg.from == socket.id) {
-            return;
-        }
-        msg.data.forEach(function (element) {
-            Array.from(document.getElementById(element.id).children).forEach(function (child) {
-                if (child.value == element.choice) {
-                    child.classList.remove("btn-secondary");
-                    child.classList.add("btn-info");
-                } else {
-                    child.classList.remove("btn-info");
-                    child.classList.add("btn-secondary");
-                }
-            });
+        msg.data.forEach(function (singleData) {
+            element = document.getElementById(singleData.id);
+            if (element.classList.contains("count-btn")) {
+                element.querySelector(".score-div").innerText = singleData.value;
+            }
+            else {
+                Array.from(element.children).forEach(function (child) {
+                    if (child.value == singleData.value) {
+                        child.classList.remove("btn-secondary");
+                        child.classList.add("btn-info");
+                    } else {
+                        child.classList.remove("btn-info");
+                        child.classList.add("btn-secondary");
+                    }
+                });
+            }
         });
     });
+
+    // socket.on("update_score", function (msg) {
+    //     console.log(msg);
+    //     if (msg.from == socket.id) {
+    //         return;
+    //     }
+    //     msg.data.forEach(function (element) {
+    //         document.getElementById(element.id).querySelector(".score-div").innerText = element.score;
+    //     })
+    // });
+
+    // socket.on("update_selection", function (msg) {
+    //     console.log(msg);
+    //     if (msg.from == socket.id) {
+    //         return;
+    //     }
+    //     msg.data.forEach(function (element) {
+    //         Array.from(document.getElementById(element.id).children).forEach(function (child) {
+    //             if (child.value == element.choice) {
+    //                 child.classList.remove("btn-secondary");
+    //                 child.classList.add("btn-info");
+    //             } else {
+    //                 child.classList.remove("btn-info");
+    //                 child.classList.add("btn-secondary");
+    //             }
+    //         });
+    //     });
+    // });
 }
 
 // function syncGameState(msg) { }

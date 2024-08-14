@@ -23,7 +23,10 @@
         <div class="container-fluid vh-100">
             <div class="row align-items-center text-center" style="height: 10%;">
                 <div class="head col">Info</div>
-                <div class="col" style="color: white;">State:<span class="connection-state">Disconnected</span></div>
+                <div class="col" style="color: white;">
+                    <div>Connection State: <span class="connection-state">Disconnected</span></div>
+                    <div>Match State: <span class="match-state">Preparing</span></div>
+                </div>
             </div>
 
             <div id="info-page" class="row  px-3" style="height: 80%; ">
@@ -31,13 +34,14 @@
 
                 <div class="select-group input-div col-12">
                     <div class="select-label">
-                        Matvh Leavel
+                        Match Level
                     </div>
                     <div id="level-select" class="select-btn-group btn-group w-100" role="group"
                         aria-label="Basic example">
-                        <button type="button" class="btn btn-secondary btn-lg" value="0">Practice</button>
-                        <button type="button" class="btn btn-secondary btn-lg" value="1">Qualification</button>
-                        <button type="button" class="btn btn-secondary btn-lg" value="2">Playoff</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="Practice">Practice</button>
+                        <button type="button" class="btn btn-secondary btn-lg"
+                            value="Qualification">Qualification</button>
+                        <button type="button" class="btn btn-secondary btn-lg" value="Playoff">Playoff</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -101,9 +105,12 @@
         </div>
 
         <div class="container-fluid text-center vh-100">
-            <div class="row align-items-center" style="height: 10%;">
-                <div class="head col">Autonomous</div>
-                <div class="col" style="color: white;">State:<span class="connection-state">Disconnected</span></div>
+            <div class="row align-items-center text-center" style="height: 10%;">
+                <div class="head col">Info</div>
+                <div class="col" style="color: white;">
+                    <div>Connection State: <span class="connection-state">Disconnected</span></div>
+                    <div>Match State: <span class="match-state">Preparing</span></div>
+                </div>
             </div>
 
             <div id="auto-input" class="row  px-3" style="height: 80%; ">
@@ -145,8 +152,8 @@
 
                 </div>
                 <!-- <div class="input-div col-6 col-sm-3">
-                    <button id="auto-fortissiom-btn" type="button" class="count-btn btn btn-warning btn-lg btn-block">
-                        <div>fortissiom</div>
+                    <button id="auto-fortissimo-btn" type="button" class="count-btn btn btn-warning btn-lg btn-block">
+                        <div>fortissimo</div>
                         <div class="score-div">0</div>
                     </button>
 
@@ -183,9 +190,12 @@
             </div>
         </div>
         <div class="container-fluid text-center vh-100">
-            <div class="row align-items-center" style="height: 10%;">
-                <div class="head col">Telop</div>
-                <div class="col" style="color: white;">State:<span class="connection-state">Disconnected</span></div>
+            <div class="row align-items-center text-center" style="height: 10%;">
+                <div class="head col">Info</div>
+                <div class="col" style="color: white;">
+                    <div>Connection State: <span class="connection-state">Disconnected</span></div>
+                    <div>Match State: <span class="match-state">Preparing</span></div>
+                </div>
             </div>
 
             <div id="telop-field" class="row  px-3" style="height: 80%; ">
@@ -204,8 +214,8 @@
 
                 </div>
                 <div class="input-div col-6 col-sm-3">
-                    <button id="telop-fortissiom-btn" type="button" class="count-btn btn btn-warning btn-lg btn-block">
-                        <div>fortissiom</div>
+                    <button id="telop-fortissimo-btn" type="button" class="count-btn btn btn-warning btn-lg btn-block">
+                        <div>fortissimo</div>
                         <div class="score-div">0</div>
                     </button>
 
