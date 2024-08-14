@@ -5,6 +5,7 @@ from threading import Timer
 from module.match import Match, recorderIdToObjectNameTable
 from module.db_operator import DBOperator
 from module.utils import get_nested_attribute, set_nested_attribute
+from functools import wraps
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -46,23 +47,52 @@ db = DBOperator()
 # }
 
 
+# def debug_decorator(func):
+#     def wrapper(*args, **kwargs):
+#         print("function", func.__name__, "called")
+#         print("args", *args)
+#         print("kwargs", **kwargs)
+#         return func(*args, **kwargs)
+#     return wrapper
+
+debug_counter = 0
+
+
+def debug_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        global debug_counter
+        debug_counter += 1
+        # print("------------------------------------")
+        print("function", func.__name__, "called", debug_counter)
+        # print("args", *args)
+        # print("kwargs", **kwargs)
+        re = func(*args, **kwargs)
+        print("function", func.__name__, "end", debug_counter)
+        # print("------------------------------------")
+        return re
+    return wrapper
+
+
 class User(UserMixin):
     pass
 
 
 @login_manager.user_loader
+@debug_decorator
 def user_loader(username):
     """  
  設置二： 透過這邊的設置讓flask_login可以隨時取到目前的使用者id   
  :param email:官網此例將email當id使用，賦值給予user.id    
  """
     print("user_loader", username)
-    usernames = db.get_all_username()
-    # usernames = ["r1", "r2", "b1", "b2"]
+    # usernames = db.get_all_username()
+    usernames = ["r1", "r2", "b1", "b2"]
     if not username in usernames:
         return None
-
+    print("get_user_start")
     user_info = db.get_user(username)
+    print("get_user_end")
 
     user = User()
     user.id = user_info[1]
@@ -73,6 +103,7 @@ def user_loader(username):
 
 
 @login_manager.unauthorized_handler
+@debug_decorator
 def unauthorized_callback():
     print("request.path", request.path)
     return redirect(url_for("login"))
@@ -80,6 +111,7 @@ def unauthorized_callback():
 
 
 @app.route('/login', methods=['GET', 'POST'])
+@debug_decorator
 def login():
     """  
  官網git很給力的寫了一個login的頁面，在GET的時候回傳渲染     
@@ -106,6 +138,7 @@ def login():
 
 
 @app.route('/logout')
+@debug_decorator
 def logout():
     """  
  logout\_user會將所有的相關session資訊給pop掉 
@@ -116,28 +149,33 @@ def logout():
 
 
 @app.route('/')
+@debug_decorator
 def index():
     return redirect(url_for("counter"))
 
 
 @app.route('/counter')
 @login_required
+@debug_decorator
 def counter():
     return render_template("counter.html")
 
 
 @app.route('/scoreboard')
+@debug_decorator
 def scoreboard():
     return render_template("scoreboard.html")
 
 
 @app.route('/simpleManagement')
+@debug_decorator
 def simpleManagement():
     print(db.get_matches_info())
     return render_template("simpleManagement.html", matches_info=db.get_matches_info())
 
 
 @app.route('/management')
+@debug_decorator
 def control():
     if int(current_user.role) > 0:
         return "", 403
@@ -145,16 +183,19 @@ def control():
 
 
 @app.route('/test')
+@debug_decorator
 def test():
     return render_template("login copy.html")
     # return render_template("test2.html")
 
 
 @app.route('/test2')
+@debug_decorator
 def test2():
     return render_template("test2.html")
 
 
+@debug_decorator
 def sync_match_info(alliance):
     socketio.emit('sync_match_info', {
         "matchLevel": match.level,
@@ -167,6 +208,7 @@ def sync_match_info(alliance):
 
 
 @socketio.on('connect')
+@debug_decorator
 def connect():
     if not current_user.is_authenticated:
         raise ConnectionRefusedError('unauthorized!')
@@ -191,6 +233,7 @@ def connect():
 
 
 @socketio.on('disconnect')
+@debug_decorator
 def disconnect():
     if current_user.role == 1:
         match.recorder.remove(request.sid)
@@ -199,6 +242,7 @@ def disconnect():
 
 
 @socketio.on('update_value')
+@debug_decorator
 def update_score(msg):
     emit('update_value', msg, to=current_user.alliance)
     for data in msg["data"]:
@@ -210,6 +254,7 @@ def update_score(msg):
 
 
 @socketio.on('commit')
+@debug_decorator
 def commit(msg):
     match.commitedRecorder.add(request.sid)
     print(match.recorder)
@@ -224,11 +269,13 @@ def commit(msg):
 
 
 @socketio.on('sync_match_state', namespace='/management')
+@debug_decorator
 def sync_match_state():
     emit('sync_match_state', match.state)
 
 
 @socketio.on('load_match', namespace='/management')
+@debug_decorator
 def load_match(data):
     match.reset()
     match_data = db.load_match_data(data["level"], data["id"])
@@ -242,6 +289,7 @@ def load_match(data):
 
 
 @socketio.on('start_match', namespace='/management')
+@debug_decorator
 def start_match(data):
     global gameTimer
     if match.state != "Preparing":
@@ -264,6 +312,7 @@ def start_match(data):
 
 
 @socketio.on('interrupt_match', namespace='/management')
+@debug_decorator
 def match_interrupted(data):
     global gameTimer
     gameTimer.cancel()
@@ -275,6 +324,7 @@ def match_interrupted(data):
     match.reset()
 
 
+@debug_decorator
 def end_match():
     match.state = "Ended"
     db.change_match_state(match.level, match.id, match.state)
@@ -285,6 +335,7 @@ def end_match():
 
 
 @socketio.on('save_and_show', namespace='/management')
+@debug_decorator
 def save_and_show(data):
     match.state = "Saved"
     db.change_match_state(match.level, match.id, match.state)
