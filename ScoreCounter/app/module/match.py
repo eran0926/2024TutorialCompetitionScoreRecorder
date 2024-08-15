@@ -85,6 +85,10 @@ detaToDBTable = {
     "blue-total-score": "blue.score.totalScore",
     "red-total-penalty": "red.score.penalty.points",
     "blue-total-penalty": "blue.score.penalty.points"
+    "red-melody-demand": "red.score.rankingPoints.melody_demand",
+    "red-ensemble-demand": "red.score.rankingPoints.ensemble_demand",
+    "blue-melody-demand": "blue.score.rankingPoints.melody_demand",
+    "blue-ensemble-demand": "blue.score.rankingPoints.ensemble_demand",
 }
 
 
