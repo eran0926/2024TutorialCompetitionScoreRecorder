@@ -21,10 +21,10 @@ recorderIdToObjectNameTable = {
 boardIdToObjectNameTable = {
     "red-score": "red.score.totalScore",
     "blue-score": "blue.score.totalScore",
-    "red-melody-demand": "red.score.rankingPoints.melody",
-    "red-ensemble-demand": "red.score.rankingPoints.ensemble",
-    "blue-melody-demand": "blue.score.rankingPoints.melody",
-    "blue-ensemble-demand": "blue.score.rankingPoints.ensemble",
+    "red-melody-demand": "red.score.rankingPoints.melody_demand",
+    "red-ensemble-demand": "red.score.rankingPoints.ensemble_demand",
+    "blue-melody-demand": "blue.score.rankingPoints.melody_demand",
+    "blue-ensemble-demand": "blue.score.rankingPoints.ensemble_demand",
 }
 
 
