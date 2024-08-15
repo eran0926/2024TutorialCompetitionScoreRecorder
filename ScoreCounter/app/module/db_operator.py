@@ -125,6 +125,24 @@ class DBOperator:
             cur.execute(
                 "UPDATE match_info SET state = ? WHERE level != ? OR id != ? AND state = ?", (0, match_level, match_id, 1))
 
+    def save_match_data(self, match_data):
+        """Save match data to the database"""
+        sql_query_head = "INSERT INTO match_result ("
+        sql_value_tuple = []
+        for i in match_data:
+            if i["id"] == "match-level":
+                i["value"] = level_to_num[i["value"]]
+            sql_query_head += "`" + i["id"] + "`,"
+            sql_value_tuple.append(i["value"])
+        sql_query = sql_query_head[:-1] + \
+            ") VALUES (" + "?,"*(len(match_data)-1) + "?)"
+        print(sql_query)
+        print(sql_value_tuple)
+        with connect() as conn:
+            cur = conn.cursor()
+
+            cur.execute(sql_query, tuple(sql_value_tuple))
+
 
 if __name__ == "__main__":
     db = DBOperator()

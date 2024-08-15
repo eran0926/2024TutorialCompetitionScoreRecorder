@@ -205,7 +205,7 @@ def update_score(msg):
 @socketio.on('commit')
 def commit(msg):
     match.commitedRecorder.add(request.sid)
-    if match.allCommited:
+    if match.allCommited():
         match.state = "All Commited"
         db.change_match_state(match.level, match.id, match.state)
         socketio.emit('all_commited', {
@@ -246,6 +246,7 @@ class ManagementSocket(Namespace):
         socketio.emit('match_start', namespace='/management')
         socketio.emit('match_start', namespace='/board')
         gameTimer = Timer(151, self.end_match)
+        # gameTimer = Timer(21, self.end_match)
         gameTimer.start()
 
     def on_interrupt_match(self, data):
@@ -270,15 +271,17 @@ class ManagementSocket(Namespace):
         match.state = "Saved"
         db.change_match_state(match.level, match.id, match.state)
         # TODO: save match data to database
-        # match_result = match.get_result()
+        match.end_match_settle()
+        match_result = match.get_match_result()
         socketio.emit('reload')
-        socketio.emit('show_result', to="board")
-        # socketio.emit('show_result', match_result, to="board")
-        # tmp = match_result.copy()
-        # dict_style_data = match.get_dict_style_data()
-        # tmp.update(dict_style_data)
-        # db.save_match_data(tmp)
-        print("\n\n\nsimulated save and show\n\n\n")
+        # socketio.emit('show_result', to="board")
+        socketio.emit('show_result', match_result, to="board")
+        tmp = match_result.copy()
+        detail_data = match.get_detail_data()
+        tmp.extend(detail_data)
+        db.save_match_data(tmp)
+        print("save and show")
+        # print("\n\n\nsimulated save and show\n\n\n")
 
 
 def sync_board_match_info():

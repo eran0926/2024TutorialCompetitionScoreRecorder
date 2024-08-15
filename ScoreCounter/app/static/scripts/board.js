@@ -52,6 +52,7 @@ function start_auto_timer() {
 }
 function start_teloop_timer() {
     var end_time = new Date().setSeconds(new Date().getSeconds() + 135);
+    // var end_time = new Date().setSeconds(new Date().getSeconds() + 5);
     var teloop_timer = setInterval(function () {
         var distance = end_time - new Date();
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);

@@ -21,10 +21,70 @@ recorderIdToObjectNameTable = {
 boardIdToObjectNameTable = {
     "red-score": "red.score.totalScore",
     "blue-score": "blue.score.totalScore",
-    "red-melody-demand": "red.score.rankingPoints.melody",
-    "red-ensemble-demand": "red.score.rankingPoints.ensemble",
-    "blue-melody-demand": "blue.score.rankingPoints.melody",
-    "blue-ensemble-demand": "blue.score.rankingPoints.ensemble",
+    "red-melody-demand": "red.score.rankingPoints.melody_demand",
+    "red-ensemble-demand": "red.score.rankingPoints.ensemble_demand",
+    "blue-melody-demand": "blue.score.rankingPoints.melody_demand",
+    "blue-ensemble-demand": "blue.score.rankingPoints.ensemble_demand"
+}
+
+resultToDBTable = {
+    "match-level": "level",
+    "match-id": "id",
+    "red-team1": "red.team1",
+    "blue-team1": "blue.team1",
+    "red-team2": "red.team2",
+    "blue-team2": "blue.team2",
+    "red-total-score-with-penalty": "red.score.totalScoreWithPenalty",
+    "blue-total-score-with-penalty": "blue.score.totalScoreWithPenalty",
+    "red-melody": "red.score.rankingPoints.melody",
+    "blue-melody": "blue.score.rankingPoints.melody",
+    "red-ensemble": "red.score.rankingPoints.ensemble",
+    "blue-ensemble": "blue.score.rankingPoints.ensemble",
+    "winner": "winner"
+}
+detaToDBTable = {
+    "red-auto-leave1": "red.score.auto.leave1",
+    "blue-auto-leave1": "blue.score.auto.leave1",
+    "red-auto-leave2": "red.score.auto.leave2",
+    "blue-auto-leave2": "blue.score.auto.leave2",
+    "red-auto-leavePoints": "red.score.auto.leavePoints",
+    "blue-auto-leavePoints": "blue.score.auto.leavePoints",
+    "red-auto-speaker": "red.score.auto.speaker",
+    "blue-auto-speaker": "blue.score.auto.speaker",
+    "red-auto-echo": "red.score.auto.echo",
+    "blue-auto-echo": "blue.score.auto.echo",
+    "red-auto-foul": "red.score.penalty.auto.foul",
+    "blue-auto-foul": "blue.score.penalty.auto.foul",
+    "red-auto-techFoul": "red.score.penalty.auto.techFoul",
+    "blue-auto-techFoul": "blue.score.penalty.auto.techFoul",
+    "red-auto-total-point": "red.score.auto.points",
+    "blue-auto-total-point": "blue.score.auto.points",
+    "red-telop-speaker": "red.score.telop.speaker",
+    "blue-telop-speaker": "blue.score.telop.speaker",
+    "red-telop-echo": "red.score.telop.echo",
+    "blue-telop-echo": "blue.score.telop.echo",
+    "red-telop-fortissimo": "red.score.telop.fortissimo",
+    "blue-telop-fortissimo": "blue.score.telop.fortissimo",
+    "red-telop-foul": "red.score.penalty.telop.foul",
+    "blue-telop-foul": "blue.score.penalty.telop.foul",
+    "red-telop-techFoul": "red.score.penalty.telop.techFoul",
+    "blue-telop-techFoul": "blue.score.penalty.telop.techFoul",
+    "red-telop-park1": "red.score.telop.park1",
+    "blue-telop-park1": "blue.score.telop.park1",
+    "red-telop-park2": "red.score.telop.park2",
+    "blue-telop-park2": "blue.score.telop.park2",
+    "red-telop-stagePoints": "red.score.telop.stagePoints",
+    "blue-telop-stagePoints": "blue.score.telop.stagePoints",
+    "red-telop-total-point": "red.score.telop.points",
+    "blue-telop-total-point": "blue.score.telop.points",
+    "red-melody-demand": "red.score.rankingPoints.melody_demand",
+    "blue-melody-demand": "blue.score.rankingPoints.melody_demand",
+    "red-ensemble-demand": "red.score.rankingPoints.ensemble_demand",
+    "blue-ensemble-demand": "blue.score.rankingPoints.ensemble_demand",
+    "red-total-score": "red.score.totalScore",
+    "blue-total-score": "blue.score.totalScore",
+    "red-total-penalty": "red.score.penalty.points",
+    "blue-total-penalty": "blue.score.penalty.points"
 }
 
 
@@ -236,6 +296,7 @@ class Match:
         self.red = Alliance()
         self.blue = Alliance()
         self.alliance = {"red": self.red, "blue": self.blue}
+        self.winner = ""
         self.recorder = set()
         self.commitedRecorder = set()
         # self.recorder = list()
@@ -298,6 +359,39 @@ class Match:
                          match_data[3])
         self.blue.setTeam(match_data[4],
                           match_data[5])
+
+    def end_match_settle(self):
+        self.countScore()
+        self.red.score.totalScoreWithPenalty = self.red.score.totalScore + \
+            self.blue.score.penalty.points
+        self.blue.score.totalScoreWithPenalty = self.blue.score.totalScore + \
+            self.red.score.penalty.points
+        if self.red.score.totalScoreWithPenalty > self.blue.score.totalScoreWithPenalty:
+            self.winner = "red"
+        elif self.red.score.totalScoreWithPenalty < self.blue.score.totalScoreWithPenalty:
+            self.winner = "blue"
+        else:
+            self.winner = "tie"
+
+    def get_match_result(self):
+        result_datas = []
+        for key in resultToDBTable:
+            result_data = {}
+            result_data["id"] = key
+            result_data["value"] = get_nested_attribute(
+                self, resultToDBTable[key])
+            result_datas.append(result_data)
+        return result_datas
+
+    def get_detail_data(self):
+        result_datas = []
+        for key in detaToDBTable:
+            result_data = {}
+            result_data["id"] = key
+            result_data["value"] = get_nested_attribute(
+                self, detaToDBTable[key])
+            result_datas.append(result_data)
+        return result_datas
 
 
 if __name__ == "__main__":
