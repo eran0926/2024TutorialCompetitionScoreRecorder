@@ -24,6 +24,7 @@
             <div class="row align-items-center text-center" style="height: 10%;">
                 <div class="head col">Info</div>
                 <div class="col" style="color: white;">
+                    <!-- <div>User: <span class="user-id">{{user.id}}</span></div> -->
                     <div>Connection State: <span class="connection-state">Disconnected</span></div>
                     <div>Match State: <span class="match-state">Preparing</span></div>
                 </div>
@@ -31,6 +32,17 @@
 
             <div id="info-page" class="row  px-3" style="height: 80%; ">
 
+                <div class="select-group input-div col-12">
+                    <div class="select-label">
+                        User
+                    </div>
+                    <div id="userId-label" class="select-btn-group btn-group w-100" role="group">
+                        <button type="button" class="btn btn-secondary btn-lg">
+                            <span>{{user.id}}</span>
+                        </button>
+                        <!-- <button type="button" class="btn btn-secondary btn-lg" value="1">6998-2</button> -->
+                    </div>
+                </div>
 
                 <div class="select-group input-div col-12">
                     <div class="select-label">
@@ -64,7 +76,7 @@
                         <button type="button" class="btn btn-secondary btn-lg" value="blue">Blue</button>
                     </div>
                 </div>
-                <div class="select-group input-div col-12">
+                <div class="select-group input-div col-6 col-sm-12">
                     <div class="select-label">
                         Team1
                     </div>
@@ -76,7 +88,7 @@
                         <!-- <button type="button" class="btn btn-secondary btn-lg" value="1">6998-2</button> -->
                     </div>
                 </div>
-                <div class="select-group input-div col-12">
+                <div class="select-group input-div col-6 col-sm-12">
                     <div class="select-label">
                         Team2
                     </div>

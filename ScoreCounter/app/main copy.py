@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_socketio import SocketIO, emit, join_room, leave_room, Namespace, ConnectionRefusedError
+from flask_socketio import SocketIO, emit, join_room, leave_room, ConnectionRefusedError
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required, logout_user
 from threading import Timer
 from module.match import Match, recorderIdToObjectNameTable
@@ -119,11 +119,6 @@ def simpleManagement():
     return render_template("simpleManagement.html", matches_info=db.get_matches_info())
 
 
-@app.route('/board')
-def board():
-    return render_template("board.html")
-
-
 @app.route('/management')
 def control():
     if int(current_user.role) > 0:
@@ -205,74 +200,78 @@ def commit(msg):
         return
 
 
-class ManagementSocket(Namespace):
-    def on_sync_match_state(self):
-        emit('sync_match_state', match.state)
-
-    def on_load_match(self, data):
-        match.reset()
-        match_data = db.load_match_data(data["level"], data["id"])
-        match.loadMatch(match_data)
-        match.state = "Preparing"
-        db.change_match_state(match.level, match.id, match.state)
-        db.reset_other_loaded_match_state(match.level, match.id)
-        sync_match_info("red")
-        sync_match_info("blue")
-
-    def on_start_match(self, data):
-        global gameTimer
-        if match.state != "Preparing":
-            emit('wrong_state', 'Match is not in preparing state')
-            print("wrong state")
-            return
-        if data["level"] != match.level or int(data["id"]) != match.id:
-            emit('wrong_match', 'Match level or number is not correct')
-            print("wrong match")
-            print(data["level"], match.level, data["id"], match.id)
-            return
-        match.state = "Running"
-        db.change_match_state(match.level, match.id, match.state)
-        # emit('match_start', brocast=True)
-        socketio.emit('match_start')
-        emit('match_start', namespace='/management')
-        gameTimer = Timer(10, self.end_match)
-        gameTimer.start()
-
-    def on_interrupt_match(self, data):
-        global gameTimer
-        gameTimer.cancel()
-        match.state = "Interrupted"
-        db.change_match_state(match.level, match.id, match.state)
-        socketio.emit('match_interrupted')
-        socketio.emit('match_interrupted', {"level": match.level,
-                                            "id": match.id}, namespace='/management')
-        match.reset()
-
-    def end_match(self):
-        match.state = "Ended"
-        db.change_match_state(match.level, match.id, match.state)
-        socketio.emit('match_end')
-        socketio.emit('match_end', {"level": match.level,
-                                    "id": match.id}, namespace='/management')
-
-    def on_save_and_show(self, data):
-        match.state = "Saved"
-        db.change_match_state(match.level, match.id, match.state)
-        # TODO: save match data to database
-        # match_result = match.get_result()
-        # socketio.emit('show_result', match_result, to="board")
-        # tmp = match_result.copy()
-        # dict_style_data = match.get_dict_style_data()
-        # tmp.update(dict_style_data)
-        # db.save_match_data(tmp)
-        print("\n\n\nsimulated save and show\n\n\n")
+@socketio.on('sync_match_state', namespace='/management')
+def sync_match_state():
+    emit('sync_match_state', match.state)
 
 
-class BoardSocket(Namespace):
-    pass
+@socketio.on('load_match', namespace='/management')
+def load_match(data):
+    match.reset()
+    match_data = db.load_match_data(data["level"], data["id"])
+    match.loadMatch(match_data)
+    match.state = "Preparing"
+    db.change_match_state(match.level, match.id, match.state)
+    db.reset_other_loaded_match_state(match.level, match.id)
+    sync_match_info("red")
+    sync_match_info("blue")
+
+
+@socketio.on('start_match', namespace='/management')
+def start_match(data):
+    global gameTimer
+    if match.state != "Preparing":
+        emit('wrong_state', 'Match is not in preparing state')
+        print("wrong state")
+        return
+    if data["level"] != match.level or int(data["id"]) != match.id:
+        emit('wrong_match', 'Match level or number is not correct')
+        print("wrong match")
+        print(data["level"], match.level, data["id"], match.id)
+        return
+    match.state = "Running"
+    db.change_match_state(match.level, match.id, match.state)
+    # emit('match_start', brocast=True)
+    socketio.emit('match_start')
+    emit('match_start', namespace='/management')
+    gameTimer = Timer(10, end_match)
+    gameTimer.start()
+
+
+@socketio.on('interrupt_match', namespace='/management')
+def match_interrupted(data):
+    global gameTimer
+    gameTimer.cancel()
+    match.state = "Interrupted"
+    db.change_match_state(match.level, match.id, match.state)
+    socketio.emit('match_interrupted')
+    socketio.emit('match_interrupted', {"level": match.level,
+                  "id": match.id}, namespace='/management')
+    match.reset()
+
+
+def end_match():
+    match.state = "Ended"
+    db.change_match_state(match.level, match.id, match.state)
+    socketio.emit('match_end')
+    socketio.emit('match_end', {"level": match.level,
+                  "id": match.id}, namespace='/management')
+
+
+@socketio.on('save_and_show', namespace='/management')
+def save_and_show(data):
+    match.state = "Saved"
+    db.change_match_state(match.level, match.id, match.state)
+    # TODO: save match data to database
+    # match_result = match.get_result()
+    # socketio.emit('show_result', match_result, to="board")
+    # tmp = match_result.copy()
+    # dict_style_data = match.get_dict_style_data()
+    # tmp.update(dict_style_data)
+    # db.save_match_data(tmp)
+    print("\n\n\nsimulated save and show\n\n\n")
 
 
 if __name__ == '__main__':
     app.debug = True
-    socketio.on_namespace(ManagementSocket('/management'))
     socketio.run(app, host='0.0.0.0', port=5000)
