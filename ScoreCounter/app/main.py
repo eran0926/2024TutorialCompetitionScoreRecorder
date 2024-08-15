@@ -128,6 +128,11 @@ def board():
     return render_template("board.html")
 
 
+@app.route('/leaderboard')
+def leaderboard():
+    return render_template("leaderboard.html")
+
+
 @app.route('/management')
 def control():
     if int(current_user.role) > 0:
