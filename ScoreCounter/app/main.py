@@ -59,8 +59,9 @@ def user_loader(username):
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
-    return redirect(url_for("login"))
-    # return redirect('/login?next=' + request.path)
+    # return redirect(url_for("login"))
+    print(request.path)
+    return redirect('/login?next=' + request.path)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -86,14 +87,12 @@ def login():
 
     login_user(user)
 
-    return redirect(url_for('index'))
+    # return redirect(url_for('index'))
+    return redirect(request.args.get('next') or url_for('index'))
 
 
 @app.route('/logout')
 def logout():
-    """  
- logout\_user會將所有的相關session資訊給pop掉 
- """
     logout_user()
     return redirect(url_for('index'))
 
@@ -106,6 +105,8 @@ def index():
 @app.route('/counter')
 @login_required
 def counter():
+    if int(current_user.role) != 1:
+        return "", 403
     return render_template("counter.html", user={'id': current_user.id})
 
 
@@ -115,7 +116,10 @@ def scoreboard():
 
 
 @app.route('/simpleManagement')
+@login_required
 def simpleManagement():
+    if int(current_user.role) > 0:
+        return "", 403
     return render_template("simpleManagement.html", matches_info=db.get_matches_info())
 
 
@@ -141,7 +145,7 @@ def test2():
     return render_template("test2.html")
 
 
-def sync_match_info(alliance):
+def sync_counter_match_info(alliance):
     socketio.emit('sync_match_info', {
         "matchLevel": match.level,
         "matchNumber": match.id,
@@ -169,6 +173,8 @@ def connect():
         "team1": match.alliance[current_user.alliance].team1,
         "team2": match.alliance[current_user.alliance].team2,
     })
+    print("sync_match_info")
+    print(match.get_all_recorder_data(current_user.alliance))
     emit('update_value', {
         "from": "host",
         "data": match.get_all_recorder_data(current_user.alliance)
@@ -191,6 +197,8 @@ def update_score(msg):
             recorderIdToObjectNameTable[data["id"]]
         set_nested_attribute(match, attr_name, data["value"])
     match.countScore()
+    update_board_value(
+        {"from": "host", "data": match.get_all_board_data()})
     print(match.red.score)
 
 
@@ -216,8 +224,9 @@ class ManagementSocket(Namespace):
         match.state = "Preparing"
         db.change_match_state(match.level, match.id, match.state)
         db.reset_other_loaded_match_state(match.level, match.id)
-        sync_match_info("red")
-        sync_match_info("blue")
+        sync_counter_match_info("red")
+        sync_counter_match_info("blue")
+        sync_board_match_info()
 
     def on_start_match(self, data):
         global gameTimer
@@ -234,8 +243,9 @@ class ManagementSocket(Namespace):
         db.change_match_state(match.level, match.id, match.state)
         # emit('match_start', brocast=True)
         socketio.emit('match_start')
-        emit('match_start', namespace='/management')
-        gameTimer = Timer(10, self.end_match)
+        socketio.emit('match_start', namespace='/management')
+        socketio.emit('match_start', namespace='/board')
+        gameTimer = Timer(151, self.end_match)
         gameTimer.start()
 
     def on_interrupt_match(self, data):
@@ -246,6 +256,7 @@ class ManagementSocket(Namespace):
         socketio.emit('match_interrupted')
         socketio.emit('match_interrupted', {"level": match.level,
                                             "id": match.id}, namespace='/management')
+        socketio.emit('match_interrupted', namespace='/board')
         match.reset()
 
     def end_match(self):
@@ -260,6 +271,8 @@ class ManagementSocket(Namespace):
         db.change_match_state(match.level, match.id, match.state)
         # TODO: save match data to database
         # match_result = match.get_result()
+        socketio.emit('reload')
+        socketio.emit('show_result', to="board")
         # socketio.emit('show_result', match_result, to="board")
         # tmp = match_result.copy()
         # dict_style_data = match.get_dict_style_data()
@@ -268,11 +281,38 @@ class ManagementSocket(Namespace):
         print("\n\n\nsimulated save and show\n\n\n")
 
 
+def sync_board_match_info():
+    match_info = {
+        "match-level": match.level,
+        "match-number": match.id,
+        "red-team1": match.alliance["red"].team1,
+        "red-team2": match.alliance["red"].team2,
+        "blue-team1": match.alliance["blue"].team1,
+        "blue-team2": match.alliance["blue"].team2,
+    }
+    print("------\n\n------------------")
+    socketio.emit('sync_match_info', match_info, namespace='/board')
+
+
+def update_board_value(data):
+    print("update_board_value")
+    print(data)
+    socketio.emit('update_value', data, namespace='/board')
+
+
 class BoardSocket(Namespace):
-    pass
+    def on_connect(self):
+        sync_board_match_info()
+        update_board_value(
+            {"from": "host", "data": match.get_all_board_data()})
+
+    def on_sync_board_match_info(self):
+        sync_board_match_info()
 
 
+update_board_value
 if __name__ == '__main__':
     app.debug = True
     socketio.on_namespace(ManagementSocket('/management'))
+    socketio.on_namespace(BoardSocket('/board'))
     socketio.run(app, host='0.0.0.0', port=5000)
