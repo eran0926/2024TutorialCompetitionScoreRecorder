@@ -137,7 +137,7 @@ def control():
 
 @app.route('/test')
 def test():
-    return render_template("leaderboard.html")
+    return render_template("result.html")
 
 
 @app.route('/test2')

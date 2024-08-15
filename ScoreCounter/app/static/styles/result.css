@@ -1,0 +1,54 @@
+.blue {
+    background-color: aqua;
+}
+
+.red {
+    background-color: rgb(242, 167, 167);
+}
+
+#match-info-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alliance-div {
+    font-size: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    /* align-items: center;
+    margin: 0 1rem; */
+}
+
+.winning-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    font-size: 6rem;
+}
+
+.score-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 1rem;
+    font-size: 12rem;
+    font-weight: 600
+}
+
+.team-number-div {
+    font-size: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.status-div {
+    font-size: 3rem;
+    letter-spacing: 0.4em;
+    font-size: 3rem;
+}
