@@ -23,7 +23,8 @@
         <div class="container-fluid vh-100 text-center">
             <div class="row" style="height: 10%;">
                 <div class="col-12" id="match-info-div">
-                    <h1 class="text-center"><span>Qualification</span><span>1</span></h1>
+                    <h1 class="text-center"><span id="match-level">Qualification</span><span id="match-number">1</span>
+                    </h1>
                 </div>
             </div>
             <div class="row" style="height: 90%;">
@@ -40,7 +41,7 @@
                         justify-content: space-around;
                         flex-direction: column;">
                             <div class="level-div">
-                                <span>Auto</span>
+                                <span id="match-period">Auto</span>
                                 <!-- <div class="btn-group w-100" role="group" aria-label="Basic example">
                                     <button type="button" class="btn btn-secondary btn-lg">Auto</button>
                                     <button type="button" class="btn btn-secondary btn-lg">Telop</button>
@@ -48,9 +49,9 @@
                             </div>
                             <div class="timer-div">
                                 <div>
-                                    <span id="times-min" class="px-1">00</span>
+                                    <span id="timer-min" class="px-1">00</span>
                                     <span class="px-1">:</span>
-                                    <span id="times-sec" class="px-1">00</span>
+                                    <span id="timer-sec" class="px-1">00</span>
                                 </div>
                             </div>
                         </div>
@@ -74,11 +75,11 @@
 
                     </div> -->
                     <div class="score-div">
-                        <span id="red-score">0</span>
+                        <span id="blue-score">0</span>
                     </div>
                     <div class="rp-div">
-                        <h1>🎵<span id="blue-Melody">0</span>/12</h1>
-                        <h1>🅿️<span id="blue-Ensemble">0</span>/18</h1>
+                        <h1>🎵<span id="blue-melody-demand">0</span>/12</h1>
+                        <h1>🅿️<span id="blue-ensemble-demand">0</span>/18</h1>
                     </div>
 
                 </div>
@@ -96,8 +97,8 @@
                         <span id="red-score">0</span>
                     </div>
                     <div class="rp-div">
-                        <h1>🎵<span id="red-Melody">0</span>/12</h1>
-                        <h1>🅿️<span id="red-Ensemble">0</span>/18</h1>
+                        <h1>🎵<span id="red-melody-demand">0</span>/12</h1>
+                        <h1>🅿️<span id="red-ensemble-demand">0</span>/18</h1>
                     </div>
 
                 </div>

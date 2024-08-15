@@ -18,6 +18,15 @@ recorderIdToObjectNameTable = {
     "telop-tech-foul-btn": "score.penalty.telop.techFoul"
 }
 
+boardIdToObjectNameTable = {
+    "red-score": "red.score.totalScore",
+    "blue-score": "blue.score.totalScore",
+    "red-melody-demand": "red.score.rankingPoints.melody",
+    "red-ensemble-demand": "red.score.rankingPoints.ensemble",
+    "blue-melody-demand": "blue.score.rankingPoints.melody",
+    "blue-ensemble-demand": "blue.score.rankingPoints.ensemble",
+}
+
 
 class Score:
     def __init__(self):
@@ -26,6 +35,7 @@ class Score:
         self.penalty = self.Penalty()
         self.rankingPoints = self.RankingPoints()
         self.totalScore = 0
+        self.totalScoreWithPenalty = 0
 
     def reset(self):
         self.auto.reset()
@@ -33,13 +43,20 @@ class Score:
         self.penalty.reset()
         self.rankingPoints.reset()
         self.totalScore = 0
+        self.totalScoreWithPenalty = 0
 
     def countScore(self):
         self.auto.countScore()
         self.telop.countScore()
-        if (self.auto.speaker + self.auto.echo + self.telop.speaker + self.telop.echo >= 12):
+        self.totalScore = self.auto.points + self.telop.points
+
+        self.rankingPoints.melody_demand = self.auto.speaker + \
+            self.auto.echo + self.telop.speaker + self.telop.echo
+        self.rankingPoints.ensemble_demand = self.auto.leavePoints + self.telop.stagePoints
+
+        if (self.rankingPoints.melody_demand >= 12):
             self.rankingPoints.melody = 1
-        if (self.auto.leavePoints + self.telop.stagePoints >= 16):
+        if (self.rankingPoints.ensemble_demand >= 16):
             self.rankingPoints.ensemble = 1
 
     class Auto:
@@ -96,6 +113,9 @@ class Score:
         def countScore(self):
             self.points = 0
 
+            if self.fortissimo > 2:
+                self.fortissimo = 2
+
             self.stagePoints = 0
             if self.park1 == 2:
                 self.stagePoints += 5
@@ -145,12 +165,16 @@ class Score:
     class RankingPoints:
         def __init__(self):
             self.melody = 0
+            self.melody_demand = 0
             self.ensemble = 0
+            self.ensemble_demand = 0
             self.win = 0
 
         def reset(self):
             self.melody = 0
+            self.melody_demand = 0
             self.ensemble = 0
+            self.ensemble_demand = 0
             self.win = 0
 
 
@@ -177,9 +201,9 @@ class Alliance:
         for key in recorderIdToObjectNameTable:
             recorder_data = {}
             recorder_data["id"] = key
-            recorder_data["data"] = key
-            get_nested_attribute(
+            recorder_data["value"] = get_nested_attribute(
                 self, recorderIdToObjectNameTable[key])
+            recorder_datas.append(recorder_data)
         return recorder_datas
 
     # def recorderIdToObject(self, id):
@@ -249,6 +273,16 @@ class Match:
         elif alliance == "blue":
             return self.blue.get_all_recorder_data()
         return []
+
+    def get_all_board_data(self):
+        board_datas = []
+        for key in boardIdToObjectNameTable:
+            board_data = {}
+            board_data["id"] = key
+            board_data["value"] = get_nested_attribute(
+                self, boardIdToObjectNameTable[key])
+            board_datas.append(board_data)
+        return board_datas
 
     def loadMatch(self, match_data):
         self.reset()

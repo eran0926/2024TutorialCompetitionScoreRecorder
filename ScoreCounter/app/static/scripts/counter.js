@@ -148,8 +148,10 @@ function setEventListener() {
                         .querySelector("#decrease-btn")
                         .classList.contains("active")
                 ) {
-                    score_div.innerText = parseInt(score_div.innerText) + 1;
-                    update_score(this.id, score_div.innerText);
+                    if (!this.hasAttribute("data-max") || parseInt(score_div.innerText) < this.getAttribute("data-max")) {
+                        score_div.innerText = parseInt(score_div.innerText) + 1;
+                        update_score(this.id, score_div.innerText);
+                    }
                 } else {
                     if (parseInt(score_div.innerText) > 0) {
                         score_div.innerText = parseInt(score_div.innerText) - 1;
@@ -280,6 +282,7 @@ function setSocket() {
             return;
         }
         msg.data.forEach(function (singleData) {
+            console.log(singleData);
             element = document.getElementById(singleData.id);
             if (element.classList.contains("count-btn")) {
                 element.querySelector(".score-div").innerText = singleData.value;
@@ -298,6 +301,12 @@ function setSocket() {
         });
     });
 
+    socket.on("match_interrupted", function (msg) {
+        location.reload();
+    });
+    socket.on("reload", function (msg) {
+        location.reload();
+    });
     // socket.on("update_score", function (msg) {
     //     console.log(msg);
     //     if (msg.from == socket.id) {
