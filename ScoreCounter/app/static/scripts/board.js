@@ -35,8 +35,8 @@ function start_auto_timer() {
     var end_time = new Date().setSeconds(new Date().getSeconds() + 15);
     var auto_timer = setInterval(function () {
         var distance = end_time - new Date();
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, "0");
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
         document.getElementById("timer-min").innerText = minutes;
         document.getElementById("timer-sec").innerText = seconds;
 
@@ -55,8 +55,8 @@ function start_teloop_timer() {
     // var end_time = new Date().setSeconds(new Date().getSeconds() + 5);
     var teloop_timer = setInterval(function () {
         var distance = end_time - new Date();
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, "0");
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
         document.getElementById("timer-min").innerText = minutes;
         document.getElementById("timer-sec").innerText = seconds;
 
