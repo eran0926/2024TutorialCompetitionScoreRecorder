@@ -125,6 +125,38 @@ class DBOperator:
             cur.execute(
                 "UPDATE match_info SET state = ? WHERE level != ? OR id != ? AND state = ?", (0, match_level, match_id, 1))
 
+    def get_match_times(self, team_number):
+        """Retrieves match times from the database"""
+        with connect() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT * FROM match_result WHERE match-level = ? red-team1 = ? OR red-team2 = ? OR blue-team1 = ? OR blue-team2 = ?", (1, team_number, team_number, team_number, team_number))
+            return len(cur.fetchall())
+
+    def get_team_rank(self, team_number):
+        """Retrieves team rank from the database"""
+        with connect() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT * FROM team_rank WHERE team_number = ?", (team_number,))
+            return cur.fetchone()
+
+    def update_team_rank(self, team_number, rank):
+        """Update team rank in the database"""
+        rank = tuple(rank)
+        with connect() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO rankings VALUES (team-number, ranking-points, average-points, average-auto-points, win, lose, tie) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE ranking-points = ?, average-points = ?, average-auto-points = ?, win = ?, lose = ?, tie = ?", rank+rank)
+# TODO
+
+    def get_all_team_rank(self):
+        """Retrieves all team rank from the database"""
+        with connect() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM team_rank")
+            return cur.fetchall()
+
     def save_match_data(self, match_data):
         """Save match data to the database"""
         sql_query_head = "INSERT INTO match_result ("

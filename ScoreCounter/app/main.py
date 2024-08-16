@@ -218,6 +218,32 @@ def commit(msg):
         return
 
 
+def update_ranks():
+    update_rank(match.alliance["red"].team1, "red", match.alliance["red"].score.rankingPoints,
+                match.red.score.totalScoreWithPenalty, match.red.score.auto.points, match.winner)
+    update_rank(match.alliance["red"].team2, "red", match.alliance["red"].score.rankingPoints,
+                match.red.score.totalScoreWithPenalty, match.red.score.auto.points, match.winner)
+    update_rank(match.alliance["blue"].team1, "blue", match.alliance["blue"].score.rankingPoints,
+                match.blue.score.totalScoreWithPenalty, match.blue.score.auto.points, match.winner)
+    update_rank(match.alliance["blue"].team2, "blue", match.alliance["blue"].score.rankingPoints,
+                match.blue.score.totalScoreWithPenalty, match.blue.score.auto.points, match.winner)
+
+
+def update_rank(team_number, alliance, rp, total_score_with_penalty, auto_score, winner):
+    match_times = db.get_match_times()
+    rank = db.get_team_rank(team_number)
+    rank[1] += rp
+    rank[2] = (rank[2]*match_times + total_score_with_penalty)/(match_times+1)
+    rank[3] = (rank[3]*match_times + auto_score)/(match_times+1)
+    if winner == "tie":
+        rank[6] += 0.5
+    if winner == alliance:
+        rank[4] += 1
+    else:
+        rank[5] += 1
+    db.update_team_rank(rank)
+
+
 class ManagementSocket(Namespace):
     def on_sync_match_state(self):
         emit('sync_match_state', match.state)
@@ -277,10 +303,15 @@ class ManagementSocket(Namespace):
         db.change_match_state(match.level, match.id, match.state)
         # TODO: save match data to database
         match.end_match_settle()
+        if match.level == "Qualification":
+            update_ranks()
+            socketio.emit('update_rank', db.get_all_team_rank(),
+                          namespace='/leaderboard')
         match_result = match.get_match_result()
         socketio.emit('reload')
         # socketio.emit('show_result', to="board")
         socketio.emit('show_result', match_result, to="board")
+        socketio.emit('show_result', match_result, to="result")
         tmp = match_result.copy()
         detail_data = match.get_detail_data()
         tmp.extend(detail_data)
@@ -316,6 +347,11 @@ class BoardSocket(Namespace):
 
     def on_sync_board_match_info(self):
         sync_board_match_info()
+
+
+class LeaderboardSocket(Namespace):
+    def on_connect(self):
+        socketio.emit('update_rank', db.get_all_team_rank())
 
 
 update_board_value
