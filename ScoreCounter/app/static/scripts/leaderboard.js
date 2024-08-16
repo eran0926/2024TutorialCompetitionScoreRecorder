@@ -1,6 +1,6 @@
 // msg = [[2401, 5, 50, 10], [2402, 8 , 50, 10], [2403, 8, 45, 5], [2404, 8, 50, 20]]
 
-socket = io.coneect("/leaderboard");
+socket = io.connect("/leaderboard");
 
 socket.on("connect", () => {
     console.log("Connected to server");

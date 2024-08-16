@@ -28,12 +28,6 @@ boardIdToObjectNameTable = {
 }
 
 resultToDBTable = {
-    "match-level": "level",
-    "match-id": "id",
-    "red-team1": "red.team1",
-    "blue-team1": "blue.team1",
-    "red-team2": "red.team2",
-    "blue-team2": "blue.team2",
     "red-total-score-with-penalty": "red.score.totalScoreWithPenalty",
     "blue-total-score-with-penalty": "blue.score.totalScoreWithPenalty",
     "red-melody": "red.score.rankingPoints.melody",
@@ -43,6 +37,12 @@ resultToDBTable = {
     "winner": "winner"
 }
 detaToDBTable = {
+    "match-level": "level",
+    "match-id": "id",
+    "red-team1": "red.team1",
+    "blue-team1": "blue.team1",
+    "red-team2": "red.team2",
+    "blue-team2": "blue.team2",
     "red-auto-leave1": "red.score.auto.leave1",
     "blue-auto-leave1": "blue.score.auto.leave1",
     "red-auto-leave2": "red.score.auto.leave2",
@@ -108,6 +108,7 @@ class Score:
     def countScore(self):
         self.auto.countScore()
         self.telop.countScore()
+        self.penalty.countScore()
         self.totalScore = self.auto.points + self.telop.points
 
         self.rankingPoints.melody_demand = self.auto.speaker + \
@@ -229,6 +230,7 @@ class Score:
             self.ensemble = 0
             self.ensemble_demand = 0
             self.win = 0
+            self.total = 0
 
         def reset(self):
             self.melody = 0
@@ -236,6 +238,7 @@ class Score:
             self.ensemble = 0
             self.ensemble_demand = 0
             self.win = 0
+            self.total = 0
 
 
 class Alliance:
@@ -368,10 +371,20 @@ class Match:
             self.red.score.penalty.points
         if self.red.score.totalScoreWithPenalty > self.blue.score.totalScoreWithPenalty:
             self.winner = "red"
+            self.red.score.rankingPoints.win = 2
         elif self.red.score.totalScoreWithPenalty < self.blue.score.totalScoreWithPenalty:
             self.winner = "blue"
+            self.blue.score.rankingPoints.win = 2
         else:
             self.winner = "tie"
+            self.red.score.rankingPoints.win = 1
+            self.blue.score.rankingPoints.win = 1
+        self.red.score.rankingPoints.total = self.red.score.rankingPoints.melody + \
+            self.red.score.rankingPoints.ensemble + \
+            self.red.score.rankingPoints.win
+        self.blue.score.rankingPoints.total = self.blue.score.rankingPoints.melody + \
+            self.blue.score.rankingPoints.ensemble + \
+            self.blue.score.rankingPoints.win
 
     def get_match_result(self):
         result_datas = []

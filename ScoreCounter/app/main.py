@@ -125,7 +125,7 @@ def simpleManagement():
 
 @app.route('/board')
 def board():
-    return render_template("board.html")
+    return render_template("board_combine.html")
 
 
 @app.route('/leaderboard')
@@ -142,7 +142,7 @@ def control():
 
 @app.route('/test')
 def test():
-    return render_template("result.html")
+    return render_template("board_combine.html")
 
 
 @app.route('/test2')
@@ -219,19 +219,23 @@ def commit(msg):
 
 
 def update_ranks():
-    update_rank(match.alliance["red"].team1, "red", match.alliance["red"].score.rankingPoints,
+    update_rank(match.alliance["red"].team1, "red", match.alliance["red"].score.rankingPoints.total,
                 match.red.score.totalScoreWithPenalty, match.red.score.auto.points, match.winner)
-    update_rank(match.alliance["red"].team2, "red", match.alliance["red"].score.rankingPoints,
+    update_rank(match.alliance["red"].team2, "red", match.alliance["red"].score.rankingPoints.total,
                 match.red.score.totalScoreWithPenalty, match.red.score.auto.points, match.winner)
-    update_rank(match.alliance["blue"].team1, "blue", match.alliance["blue"].score.rankingPoints,
+    update_rank(match.alliance["blue"].team1, "blue", match.alliance["blue"].score.rankingPoints.total,
                 match.blue.score.totalScoreWithPenalty, match.blue.score.auto.points, match.winner)
-    update_rank(match.alliance["blue"].team2, "blue", match.alliance["blue"].score.rankingPoints,
+    update_rank(match.alliance["blue"].team2, "blue", match.alliance["blue"].score.rankingPoints.total,
                 match.blue.score.totalScoreWithPenalty, match.blue.score.auto.points, match.winner)
 
 
 def update_rank(team_number, alliance, rp, total_score_with_penalty, auto_score, winner):
-    match_times = db.get_match_times()
+    match_times = db.get_match_times(team_number)
     rank = db.get_team_rank(team_number)
+    # print(rank)
+    if rank is None:
+        rank = [team_number, 0, 0, 0, 0, 0, 0]
+    rank = list(rank)
     rank[1] += rp
     rank[2] = (rank[2]*match_times + total_score_with_penalty)/(match_times+1)
     rank[3] = (rank[3]*match_times + auto_score)/(match_times+1)
@@ -241,7 +245,7 @@ def update_rank(team_number, alliance, rp, total_score_with_penalty, auto_score,
         rank[4] += 1
     else:
         rank[5] += 1
-    db.update_team_rank(rank)
+    db.update_team_rank(team_number, rank)
 
 
 class ManagementSocket(Namespace):
@@ -276,8 +280,8 @@ class ManagementSocket(Namespace):
         socketio.emit('match_start')
         socketio.emit('match_start', namespace='/management')
         socketio.emit('match_start', namespace='/board')
-        gameTimer = Timer(151, self.end_match)
-        # gameTimer = Timer(21, self.end_match)
+        # gameTimer = Timer(151, self.end_match)
+        gameTimer = Timer(21, self.end_match)
         gameTimer.start()
 
     def on_interrupt_match(self, data):
@@ -310,8 +314,8 @@ class ManagementSocket(Namespace):
         match_result = match.get_match_result()
         socketio.emit('reload')
         # socketio.emit('show_result', to="board")
-        socketio.emit('show_result', match_result, to="board")
-        socketio.emit('show_result', match_result, to="result")
+        socketio.emit('show_result', match_result, namespace="/board")
+        # socketio.emit('show_result', match_result, to="result")
         tmp = match_result.copy()
         detail_data = match.get_detail_data()
         tmp.extend(detail_data)
@@ -350,8 +354,11 @@ class BoardSocket(Namespace):
 
 
 class LeaderboardSocket(Namespace):
+
     def on_connect(self):
-        socketio.emit('update_rank', db.get_all_team_rank())
+        print("leaderboard connect")
+        print("\n\n\n")
+        emit('update_rank', db.get_all_team_rank())
 
 
 update_board_value
@@ -359,4 +366,5 @@ if __name__ == '__main__':
     app.debug = True
     socketio.on_namespace(ManagementSocket('/management'))
     socketio.on_namespace(BoardSocket('/board'))
+    socketio.on_namespace(LeaderboardSocket('/leaderboard'))
     socketio.run(app, host='0.0.0.0', port=5000)
