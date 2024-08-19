@@ -8,8 +8,11 @@ flask-socketio = "*"
 flask = "*"
 flask-login = "*"
 mariadb = "*"
+gunicorn = "*"
+colorama = "*"
+eventlet = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12"
+python_version = "*"

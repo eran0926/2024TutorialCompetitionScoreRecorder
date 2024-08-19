@@ -17,7 +17,7 @@ login_manager.init_app(app)
 match = Match()
 
 db = DBOperator()
-
+db.check_tables()
 
 debug_counter = 0
 
@@ -280,8 +280,8 @@ class ManagementSocket(Namespace):
         socketio.emit('match_start')
         socketio.emit('match_start', namespace='/management')
         socketio.emit('match_start', namespace='/board')
-        # gameTimer = Timer(151, self.end_match)
-        gameTimer = Timer(21, self.end_match)
+        gameTimer = Timer(151, self.end_match)
+        # gameTimer = Timer(21, self.end_match)
         gameTimer.start()
 
     def on_interrupt_match(self, data):

@@ -1,0 +1,36 @@
+version: '3'
+
+name: score_counter
+
+services:
+  score_counter:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_PASSWORD: front_end_sucks
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: this_project_is_trash
+      MYSQL_DATABASE: counter_db
+      MYSQL_USER: counter
+      MYSQL_PASSWORD: front_end_sucks
+    volumes:
+      - .data/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      # test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+# docker run --name phpmyadmin --network score_counter_default -d -p 8080:80 phpmyadmin
