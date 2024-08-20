@@ -33,4 +33,17 @@ services:
       timeout: 5s
       retries: 3
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8080:80"
+    # environment:
+    #   PMA_HOST: db
+    #   MYSQL_ROOT_PASSWORD: this_project_is_trash
+    #   MYSQL_USER: counter
+    #   MYSQL_PASSWORD: front_end_sucks
+    depends_on:
+      db:
+        condition: service_healthy
+
 # docker run --name phpmyadmin --network score_counter_default -d -p 8080:80 phpmyadmin

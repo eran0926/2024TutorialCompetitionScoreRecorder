@@ -60,7 +60,7 @@ class DBOperator:
                 cur.execute(
                     "ALTER TABLE `users`  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;")
             if ('match_info',) not in tables:
-                cur.execute("CREATE TABLE `match_info` (  `level` int(11) NOT NULL DEFAULT 2,  `id` int(11) NOT NULL,  `red1` char(8) NOT NULL,  `red2` char(8) NOT NULL,  `blue1` char(8) NOT NULL,  `blue2` char(8) NOT NULL,  `state` int(11) NOT NULL DEFAULT 0);")
+                cur.execute("CREATE TABLE `match_info` (  `level` int(11) NOT NULL DEFAULT 0,  `id` int(11) NOT NULL,  `red1` char(8) NOT NULL,  `red2` char(8) NOT NULL,  `blue1` char(8) NOT NULL,  `blue2` char(8) NOT NULL,  `state` int(11) NOT NULL DEFAULT 0);")
                 cur.execute(
                     "ALTER TABLE `match_info` ADD PRIMARY KEY (`level`,`id`);")
             if ('match_result',) not in tables:

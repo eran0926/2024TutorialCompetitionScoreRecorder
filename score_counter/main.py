@@ -105,8 +105,12 @@ def index():
 @app.route('/counter')
 @login_required
 def counter():
-    if int(current_user.role) != 1:
-        return "", 403
+    if int(current_user.role) == 0:
+        # return "", 403
+        return redirect(url_for("simpleManagement"))
+    elif int(current_user.role) != 1:
+        return redirect(url_for("login"))
+
     return render_template("counter.html", user={'id': current_user.id})
 
 
@@ -119,7 +123,11 @@ def scoreboard():
 @login_required
 def simpleManagement():
     if int(current_user.role) > 0:
-        return "", 403
+        if int(current_user.role) == 1:
+            return redirect(url_for("counter"))
+        else:
+            return redirect(url_for("login"))
+        # return "", 403
     return render_template("simpleManagement.html", matches_info=db.get_matches_info())
 
 
